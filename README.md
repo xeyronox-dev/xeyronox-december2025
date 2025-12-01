@@ -1,34 +1,46 @@
-December Lab – Gardio
+---
+title: Gardio
+emoji: ⚡
+colorFrom: green
+colorTo: gray
+sdk: gradio
+sdk_version: "4.31.5"
+app_file: app.py
+pinned: false
+license: unlicense
+short_description: Xeyronox December 2025 Lab - AI/ML Learning & Deployment Space
+---
 
-Creator: Xeyronox
-Purpose: This Space serves as my personal development lab for learning AI, Machine Learning, and deployment workflows. It hosts small experiments, demos, and beginner-friendly implementations as I grow through my December 2025 self-development roadmap.
+# Gardio ⚡
 
-Features
+**Xeyronox December 2025 Transformation Journey**
 
-Gradio-based web interface
+Daily work, notes, and learning progress for December 2025 transformation.
 
-Lightweight Python backend
+## 🚀 Features
 
-Fully deployable Hugging Face Space
+This Gradio Space includes:
 
-Foundation for future ML models and interactive tools
+- **👋 Welcome Tab** - Personalized greeting messages with randomized responses
+- **🔢 Calculator** - Basic arithmetic operations (add, subtract, multiply, divide)
+- **📝 Text Analyzer** - Comprehensive text analysis including word count, character count, and statistics
 
-Tech Stack
+## 🛠️ Tech Stack
 
-Python
+- **Gradio 4.31.5** - Web UI framework
+- **Python 3.x** - Programming language
+- **HuggingFace Spaces** - Deployment platform
 
-Gradio
+## 📦 Deployment
 
-Hugging Face Spaces
+This Space is automatically synced with:
+- **GitHub:** [xeyronox-dev/xeyronox-december2025](https://github.com/xeyronox-dev/xeyronox-december2025)
+- **HuggingFace:** [xeyronox/Gardio](https://huggingface.co/spaces/xeyronox/Gardio)
 
-Git Version Control
+## 📚 Documentation
 
-Roadmap
+Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
 
-Add ML model demos
+---
 
-Build small utilities (text tools, CV tools, data tools)
-
-Integrate Python backend logic
-
-Prepare for more advanced architectures in 2026
+**Built with ❤️ by Xeyronox**

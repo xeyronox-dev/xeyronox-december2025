@@ -1,216 +1,186 @@
 import gradio as gr
+import random
 from datetime import datetime
 
-# ===== Core Functions =====
-
-def welcome_message(name):
-    """Welcome function with personalized greeting"""
+# Welcome message function
+def welcome(name):
     if not name or name.strip() == "":
-        return "👋 Welcome to Gardio! Please enter your name to get started."
+        return "👋 Please enter your name to get started!"
     
-    current_time = datetime.now().strftime("%I:%M %p")
-    message = (
-        f"🎉 Welcome to December Lab, **{name}**!\n\n"
-        f"Current Time: {current_time}\n\n"
-        f"This Space is created by **Xeyronox** for AI/ML learning, "
-        f"project testing, and deployment experiments.\n\n"
-        f"Explore the tabs above to try different tools and features! ⚡"
-    )
+    greetings = [
+        f"Welcome to Gardio, {name}! ⚡",
+        f"Hello {name}! Ready to explore? 🚀",
+        f"Greetings {name}! Let's build something amazing! 💡",
+        f"Hey {name}! Welcome to the December Lab! 🧪"
+    ]
+    
+    message = random.choice(greetings)
+    message += f"\n\nThis Space is created by Xeyronox for AI/ML learning, "
+    message += f"project testing, and deployment experiments."
+    message += f"\n\n🕐 Current time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+    
     return message
 
-def text_analyzer(text):
-    """Analyze text and provide statistics"""
-    if not text or text.strip() == "":
-        return "Please enter some text to analyze."
-    
-    words = text.split()
-    characters = len(text)
-    characters_no_spaces = len(text.replace(" ", ""))
-    word_count = len(words)
-    sentence_count = text.count('.') + text.count('!') + text.count('?')
-    
-    analysis = (
-        f"📊 **Text Analysis Results**\n\n"
-        f"• Characters (with spaces): {characters}\n"
-        f"• Characters (without spaces): {characters_no_spaces}\n"
-        f"• Words: {word_count}\n"
-        f"• Sentences: {sentence_count}\n"
-        f"• Average word length: {characters_no_spaces/word_count:.2f} characters\n"
-    )
-    return analysis
-
-def calculator(num1, operation, num2):
-    """Simple calculator function"""
+# Calculator function
+def calculate(num1, operation, num2):
     try:
         num1 = float(num1)
         num2 = float(num2)
         
-        if operation == "Add (+)":
+        if operation == "Add ➕":
             result = num1 + num2
-        elif operation == "Subtract (-)":
+        elif operation == "Subtract ➖":
             result = num1 - num2
-        elif operation == "Multiply (×)":
+        elif operation == "Multiply ✖️":
             result = num1 * num2
-        elif operation == "Divide (÷)":
+        elif operation == "Divide ➗":
             if num2 == 0:
                 return "❌ Error: Cannot divide by zero!"
             result = num1 / num2
         else:
-            return "❌ Error: Invalid operation"
+            return "❌ Invalid operation"
         
-        return f"✅ **Result:** {num1} {operation.split()[1]} {num2} = **{result}**"
+        return f"✅ Result: {result}"
     except ValueError:
         return "❌ Error: Please enter valid numbers"
 
-def generate_gradient(color1, color2):
-    """Generate a simple gradient description"""
-    gradient_text = (
-        f"🎨 **Gradient Preview**\n\n"
-        f"Color 1: {color1}\n"
-        f"Color 2: {color2}\n\n"
-        f"This would create a beautiful gradient from {color1} to {color2}!"
-    )
-    return gradient_text
-
-# ===== Custom Theme =====
-custom_theme = gr.themes.Soft(
-    primary_hue="emerald",
-    secondary_hue="blue",
-    neutral_hue="slate",
-    font=("Inter", "sans-serif")
-).set(
-    body_background_fill="linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-    body_background_fill_dark="linear-gradient(135deg, #1e3a8a 0%, #312e81 100%)",
-)
-
-# ===== Build Interface =====
-
-with gr.Blocks(theme=custom_theme, title="Gardio - Xeyronox December Lab") as demo:
+# Text analysis function
+def analyze_text(text):
+    if not text or text.strip() == "":
+        return "📝 Please enter some text to analyze."
     
-    # Header
+    words = text.split()
+    chars = len(text)
+    chars_no_spaces = len(text.replace(" ", ""))
+    word_count = len(words)
+    sentence_count = text.count('.') + text.count('!') + text.count('?')
+    
+    analysis = f"📊 **Text Analysis Results:**\n\n"
+    analysis += f"• **Characters:** {chars}\n"
+    analysis += f"• **Characters (no spaces):** {chars_no_spaces}\n"
+    analysis += f"• **Words:** {word_count}\n"
+    analysis += f"• **Sentences:** {sentence_count if sentence_count > 0 else 1}\n"
+    
+    if word_count > 0:
+        avg_word_length = chars_no_spaces / word_count
+        analysis += f"• **Average word length:** {avg_word_length:.2f} characters\n"
+    
+    return analysis
+
+# Create tabbed interface
+with gr.Blocks(theme=gr.themes.Soft(), title="Gardio - December Lab") as demo:
     gr.Markdown(
         """
         # ⚡ Gardio - December Lab
         ### A personal experimental Space for learning AI/ML deployment
-        *Created by Xeyronox for testing and deployment experiments*
+        
+        Created by **Xeyronox** for December 2025 transformation journey.
         """
     )
     
-    # Tabs
     with gr.Tabs():
-        
-        # Tab 1: Welcome
-        with gr.Tab("🏠 Welcome"):
+        # Welcome Tab
+        with gr.Tab("👋 Welcome"):
+            gr.Markdown("### Get a personalized welcome message!")
             with gr.Row():
-                with gr.Column(scale=2):
+                with gr.Column():
                     name_input = gr.Textbox(
-                        label="Enter Your Name",
+                        label="Enter your name",
                         placeholder="Type your name here...",
                         lines=1
                     )
                     welcome_btn = gr.Button("Get Welcome Message", variant="primary")
-                with gr.Column(scale=3):
-                    welcome_output = gr.Markdown(label="Welcome Message")
+                with gr.Column():
+                    welcome_output = gr.Textbox(
+                        label="Welcome Message",
+                        lines=6,
+                        interactive=False
+                    )
             
-            # Examples
+            welcome_btn.click(
+                fn=welcome,
+                inputs=name_input,
+                outputs=welcome_output
+            )
+            
             gr.Examples(
                 examples=[["Xeyronox"], ["Developer"], ["AI Enthusiast"]],
                 inputs=name_input
             )
+        
+        # Calculator Tab
+        with gr.Tab("🔢 Calculator"):
+            gr.Markdown("### Simple calculator for basic operations")
+            with gr.Row():
+                with gr.Column():
+                    num1 = gr.Number(label="First Number", value=0)
+                    operation = gr.Radio(
+                        choices=["Add ➕", "Subtract ➖", "Multiply ✖️", "Divide ➗"],
+                        label="Operation",
+                        value="Add ➕"
+                    )
+                    num2 = gr.Number(label="Second Number", value=0)
+                    calc_btn = gr.Button("Calculate", variant="primary")
+                with gr.Column():
+                    calc_output = gr.Textbox(
+                        label="Result",
+                        lines=3,
+                        interactive=False
+                    )
             
-            welcome_btn.click(
-                fn=welcome_message,
-                inputs=name_input,
-                outputs=welcome_output
+            calc_btn.click(
+                fn=calculate,
+                inputs=[num1, operation, num2],
+                outputs=calc_output
+            )
+            
+            gr.Examples(
+                examples=[
+                    [10, "Add ➕", 5],
+                    [20, "Multiply ✖️", 3],
+                    [100, "Divide ➗", 4]
+                ],
+                inputs=[num1, operation, num2]
             )
         
-        # Tab 2: Text Analyzer
+        # Text Analyzer Tab
         with gr.Tab("📝 Text Analyzer"):
+            gr.Markdown("### Analyze your text for word count, character count, and more")
             with gr.Row():
                 with gr.Column():
                     text_input = gr.Textbox(
-                        label="Enter Text to Analyze",
+                        label="Enter text to analyze",
                         placeholder="Type or paste your text here...",
-                        lines=5
+                        lines=8
                     )
                     analyze_btn = gr.Button("Analyze Text", variant="primary")
                 with gr.Column():
-                    analysis_output = gr.Markdown(label="Analysis Results")
+                    text_output = gr.Textbox(
+                        label="Analysis Results",
+                        lines=8,
+                        interactive=False
+                    )
             
             analyze_btn.click(
-                fn=text_analyzer,
+                fn=analyze_text,
                 inputs=text_input,
-                outputs=analysis_output
+                outputs=text_output
             )
-        
-        # Tab 3: Calculator
-        with gr.Tab("🧮 Calculator"):
-            with gr.Row():
-                num1_input = gr.Number(label="Number 1", value=0)
-                operation_input = gr.Dropdown(
-                    choices=["Add (+)", "Subtract (-)", "Multiply (×)", "Divide (÷)"],
-                    label="Operation",
-                    value="Add (+)"
-                )
-                num2_input = gr.Number(label="Number 2", value=0)
             
-            calc_btn = gr.Button("Calculate", variant="primary")
-            calc_output = gr.Markdown(label="Result")
-            
-            calc_btn.click(
-                fn=calculator,
-                inputs=[num1_input, operation_input, num2_input],
-                outputs=calc_output
-            )
-        
-        # Tab 4: Gradient Preview
-        with gr.Tab("🎨 Gradient Maker"):
-            with gr.Row():
-                color1_input = gr.ColorPicker(label="Color 1", value="#667eea")
-                color2_input = gr.ColorPicker(label="Color 2", value="#764ba2")
-            
-            gradient_btn = gr.Button("Preview Gradient", variant="primary")
-            gradient_output = gr.Markdown(label="Gradient Info")
-            
-            gradient_btn.click(
-                fn=generate_gradient,
-                inputs=[color1_input, color2_input],
-                outputs=gradient_output
-            )
-        
-        # Tab 5: About
-        with gr.Tab("ℹ️ About"):
-            gr.Markdown(
-                """
-                ## About Gardio
-                
-                **Gardio** is a demonstration Gradio Space created as part of the Xeyronox December 2025 transformation project.
-                
-                ### Features
-                - 🏠 Personalized welcome messages
-                - 📝 Text analysis tool
-                - 🧮 Simple calculator
-                - 🎨 Gradient color preview
-                
-                ### Tech Stack
-                - **Framework:** Gradio 6.0.1
-                - **Deployment:** HuggingFace Spaces
-                - **Repository:** GitHub & HuggingFace
-                
-                ### Links
-                - 🔗 [GitHub Repository](https://github.com/xeyronox-dev/xeyronox-december2025)
-                - 🤗 [HuggingFace Space](https://huggingface.co/spaces/xeyronox/Gardio)
-                
-                ---
-                *Built with ❤️ by Xeyronox | December 2025*
-                """
+            gr.Examples(
+                examples=[
+                    ["Hello World! This is a test sentence."],
+                    ["AI and Machine Learning are transforming the world."]
+                ],
+                inputs=text_input
             )
     
-    # Footer
-    gr.Markdown("---")
-    gr.Markdown("⚡ **Gardio v1.0** | Powered by Gradio")
+    gr.Markdown(
+        """
+        ---
+        **Powered by Gradio 4.31.5** | Built with ❤️ by Xeyronox
+        """
+    )
 
-# Launch
 if __name__ == "__main__":
     demo.launch()
-

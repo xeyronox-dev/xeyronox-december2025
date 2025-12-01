@@ -1,15 +1,15 @@
 # Gardio Assets
 
-This folder contains assets for the Gardio Gradio Space.
+This directory contains assets for the Gardio Gradio application.
 
-## Contents
+## Directory Structure
 
-### logo.txt
-ASCII art logo for Gardio - used for branding and visual identity.
+- `images/` - Image assets (logos, icons, screenshots)
+- `data/` - Sample data files for demonstrations
+- `models/` - Pre-trained model files (tracked with Git LFS)
 
-## Usage
+## Notes
 
-Assets in this folder can be referenced by the Gradio app or documentation.
-
----
-*Part of the Xeyronox December 2025 transformation project*
+- Large files are automatically tracked with Git LFS (see `.gitattributes`)
+- Keep assets organized by type
+- Add new subdirectories as needed
