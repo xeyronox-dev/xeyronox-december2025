@@ -4,7 +4,7 @@ emoji: ⚡
 colorFrom: green
 colorTo: gray
 sdk: gradio
-sdk_version: "4.31.5"
+sdk_version: "6.0.2"
 app_file: app.py
 pinned: false
 license: unlicense
@@ -28,7 +28,7 @@ This Gradio Space includes:
 
 ## 🛠️ Tech Stack
 
-- **Gradio 4.31.5** - Web UI framework
+- **Gradio 6.0.2** - Web UI framework
 - **Python 3.x** - Programming language
 - **HuggingFace Spaces** - Deployment platform
 

@@ -68,7 +68,7 @@ def analyze_text(text):
     return analysis
 
 # Create tabbed interface
-with gr.Blocks(theme=gr.themes.Soft(), title="Gardio - December Lab") as demo:
+with gr.Blocks(title="Gardio - December Lab") as demo:
     gr.Markdown(
         """
         # ⚡ Gardio - December Lab
@@ -252,7 +252,7 @@ with gr.Blocks(theme=gr.themes.Soft(), title="Gardio - December Lab") as demo:
     gr.Markdown(
         """
         ---
-        **Powered by Gradio 4.31.5** | Built with ❤️ by Xeyronox
+        **Powered by Gradio 6.0.2** | Built with ❤️ by Xeyronox
         """
     )
 
