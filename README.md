@@ -8,7 +8,7 @@ sdk_version: "4.31.5"
 app_file: app.py
 pinned: false
 license: unlicense
-short_description: Xeyronox December 2025 Lab - AI/ML Learning & Deployment Space
+short_description: Xeyronox December 2025 - AI/ML Learning Space
 ---
 
 # Gardio ⚡
@@ -24,6 +24,7 @@ This Gradio Space includes:
 - **👋 Welcome Tab** - Personalized greeting messages with randomized responses
 - **🔢 Calculator** - Basic arithmetic operations (add, subtract, multiply, divide)
 - **📝 Text Analyzer** - Comprehensive text analysis including word count, character count, and statistics
+- **🔄 Text Transform** - Fun text transformations (reverse, case conversion, space removal, vowel counting)
 
 ## 🛠️ Tech Stack
 

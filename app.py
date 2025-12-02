@@ -174,6 +174,80 @@ with gr.Blocks(theme=gr.themes.Soft(), title="Gardio - December Lab") as demo:
                 ],
                 inputs=text_input
             )
+        
+        # Text Transform Tab (Day 2 Addition)
+        with gr.Tab("🔄 Text Transform"):
+            gr.Markdown("### Transform your text in fun and useful ways!")
+            with gr.Row():
+                with gr.Column():
+                    transform_input = gr.Textbox(
+                        label="Enter text to transform",
+                        placeholder="Type your text here...",
+                        lines=5
+                    )
+                    transform_type = gr.Radio(
+                        choices=[
+                            "🔄 Reverse Text",
+                            "🔼 UPPERCASE",
+                            "🔽 lowercase",
+                            "📏 Remove Spaces",
+                            "🎯 Count Vowels & Consonants"
+                        ],
+                        label="Choose transformation",
+                        value="🔄 Reverse Text"
+                    )
+                    transform_btn = gr.Button("Transform", variant="primary")
+                with gr.Column():
+                    transform_output = gr.Textbox(
+                        label="Transformed Text",
+                        lines=8,
+                        interactive=False
+                    )
+            
+            def transform_text(text, transform_type):
+                if not text or text.strip() == "":
+                    return "⚠️ Please enter some text to transform."
+                
+                if transform_type == "🔄 Reverse Text":
+                    return text[::-1]
+                elif transform_type == "🔼 UPPERCASE":
+                    return text.upper()
+                elif transform_type == "🔽 lowercase":
+                    return text.lower()
+                elif transform_type == "📏 Remove Spaces":
+                    return text.replace(" ", "")
+                elif transform_type == "🎯 Count Vowels & Consonants":
+                    vowels = "aeiouAEIOU"
+                    vowel_count = sum(1 for char in text if char in vowels)
+                    consonant_count = sum(1 for char in text if char.isalpha() and char not in vowels)
+                    total_alpha = sum(1 for char in text if char.isalpha())
+                    
+                    result = f"📊 **Character Analysis:**\n\n"
+                    result += f"• **Vowels:** {vowel_count}\n"
+                    result += f"• **Consonants:** {consonant_count}\n"
+                    result += f"• **Total Letters:** {total_alpha}\n"
+                    if total_alpha > 0:
+                        vowel_percent = (vowel_count / total_alpha) * 100
+                        result += f"• **Vowel Percentage:** {vowel_percent:.1f}%\n"
+                    result += f"\n**Original Text:**\n{text}"
+                    return result
+                
+                return text
+            
+            transform_btn.click(
+                fn=transform_text,
+                inputs=[transform_input, transform_type],
+                outputs=transform_output
+            )
+            
+            gr.Examples(
+                examples=[
+                    ["Hello World!", "🔄 Reverse Text"],
+                    ["make this loud", "🔼 UPPERCASE"],
+                    ["MAKE THIS QUIET", "🔽 lowercase"]
+                ],
+                inputs=[transform_input, transform_type]
+            )
     
     gr.Markdown(
         """
