@@ -1,5 +1,5 @@
 # Gradio Application Dependencies
-gradio==6.0.2
+gradio==5.9.1
 
 # Additional utilities
 python-dateutil>=2.8.0

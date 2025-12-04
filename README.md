@@ -1,16 +1,3 @@
----
-title: Gardio
-emoji: ⚡
-colorFrom: indigo
-colorTo: blue
-sdk: gradio
-sdk_version: "4.19.0"
-app_file: app.py
-pinned: true
-license: mit
-short_description: Advanced Text Analysis and Processing Toolkit
----
-
 # 🚀 Gardio - Text Analysis Suite
 
 **Xeyronox December 2025 Transformation Journey**
