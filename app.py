@@ -4,8 +4,12 @@ import re
 from collections import Counter
 from datetime import datetime
 
-# Welcome message function
+# ============================================
+# UTILITY FUNCTIONS
+# ============================================
+
 def welcome(name):
+    """Generate personalized welcome message"""
     if not name or name.strip() == "":
         return "👋 Please enter your name to get started!"
     
@@ -23,319 +27,297 @@ def welcome(name):
     
     return message
 
-# Calculator function
 def calculate(num1, operation, num2):
+    """Basic calculator operations"""
     try:
         num1 = float(num1)
         num2 = float(num2)
         
-        if operation == "Add ➕":
-            result = num1 + num2
-        elif operation == "Subtract ➖":
-            result = num1 - num2
-        elif operation == "Multiply ✖️":
-            result = num1 * num2
-        elif operation == "Divide ➗":
-            if num2 == 0:
-                return "❌ Error: Cannot divide by zero!"
-            result = num1 / num2
-        else:
-            return "❌ Invalid operation"
+        operations = {
+            "➕ Add": lambda a, b: a + b,
+            "➖ Subtract": lambda a, b: a - b,
+            "✖️ Multiply": lambda a, b: a * b,
+            "➗ Divide": lambda a, b: "Cannot divide by zero!" if b == 0 else a / b
+        }
         
-        return f"✅ Result: {result}"
+        result = operations.get(operation, lambda a, b: "Invalid operation")(num1, num2)
+        return f"✅ Result: {result}" if isinstance(result, (int, float)) else f"❌ {result}"
     except ValueError:
-        return "❌ Error: Please enter valid numbers"
+        return "❌ Please enter valid numbers"
 
-# Text analysis function
 def analyze_text(text):
+    """Comprehensive text analysis"""
     if not text or text.strip() == "":
-        return "📝 Please enter some text to analyze."
+        return "📝 Enter some text to analyze."
     
     words = text.split()
     chars = len(text)
     chars_no_spaces = len(text.replace(" ", ""))
     word_count = len(words)
-    sentence_count = text.count('.') + text.count('!') + text.count('?')
+    sentence_count = max(1, text.count('.') + text.count('!') + text.count('?'))
     
-    analysis = f"📊 **Text Analysis Results:**\n\n"
-    analysis += f"• **Characters:** {chars}\n"
-    analysis += f"• **Characters (no spaces):** {chars_no_spaces}\n"
-    analysis += f"• **Words:** {word_count}\n"
-    analysis += f"• **Sentences:** {sentence_count if sentence_count > 0 else 1}\n"
-    
-    if word_count > 0:
-        avg_word_length = chars_no_spaces / word_count
-        analysis += f"• **Average word length:** {avg_word_length:.2f} characters\n"
-    
-    return analysis
+    return f"""📊 **Text Analysis**
 
-def word_frequency_analyzer(text):
+| Metric | Value |
+|--------|-------|
+| Characters | {chars:,} |
+| Characters (no spaces) | {chars_no_spaces:,} |
+| Words | {word_count:,} |
+| Sentences | {sentence_count} |
+| Avg word length | {chars_no_spaces / max(1, word_count):.1f} chars |
+"""
+
+def word_frequency(text):
+    """Analyze word frequency in text"""
     if not text or text.strip() == "":
-        return "📝 Please enter some text to analyze."
+        return "📝 Enter some text to analyze."
     
-    # Clean text and split into words
     words = re.sub(r'[^\w\s]', ' ', text.lower()).split()
-    
     if not words:
-        return "No valid words found in the text."
+        return "No valid words found."
     
-    # Calculate statistics
     word_counts = Counter(words)
-    total_words = len(words)
-    unique_words = len(word_counts)
-    top_words = word_counts.most_common(5)
+    total = len(words)
+    unique = len(word_counts)
+    top_5 = word_counts.most_common(5)
     
-    # Format results
-    result = f"📊 **Word Frequency Analysis**\n\n"
-    result += f"• **Total words:** {total_words:,}\n"
-    result += f"• **Unique words:** {unique_words:,}\n\n"
-    
-    result += "**Top 5 Most Frequent Words:**\n"
-    for i, (word, count) in enumerate(top_words, 1):
-        percentage = (count / total_words) * 100
-        result += f"{i}. '{word}': {count:,} ({percentage:.1f}%)\n"
+    result = f"""📊 **Word Frequency Analysis**
+
+**Stats:**
+- Total words: **{total:,}**
+- Unique words: **{unique:,}**
+
+**Top 5 Words:**
+"""
+    for i, (word, count) in enumerate(top_5, 1):
+        pct = (count / total) * 100
+        bar = "█" * int(pct / 5) + "░" * (20 - int(pct / 5))
+        result += f"\n{i}. `{word}` → {count} ({pct:.1f}%) {bar}"
     
     return result
 
-# Create tabbed interface with dark theme
-with gr.Blocks(
-    title="Gardio - December Lab",
-    theme=gr.themes.Soft(
-        primary_hue="blue",
-        secondary_hue="indigo",
-        neutral_hue="slate",
-        radius_size=gr.themes.sizes.radius_md,
-        font=["Inter", "sans-serif"],
-    )
-) as demo:
-    # Custom CSS for additional styling
-    css = """
-    .gradio-container {
-        background: linear-gradient(135deg, #1e1e2f 0%, #1a1a2e 100%) !important;
+def transform_text(text, mode):
+    """Transform text in various ways"""
+    if not text:
+        return "⚠️ Enter text to transform"
+    
+    transforms = {
+        "🔄 Reverse": text[::-1],
+        "🔼 UPPERCASE": text.upper(),
+        "🔽 lowercase": text.lower(),
+        "📏 No Spaces": text.replace(" ", ""),
+        "🎯 Title Case": text.title(),
+        "🔀 Shuffle Words": " ".join(random.sample(text.split(), len(text.split()))) if text.split() else text,
     }
-    .gradio-header {
-        color: white !important;
-    }
-    .tab-nav button {
-        font-weight: 600 !important;
-    }
-    """
-    demo.css = css
-    gr.Markdown(
-        """
-        # ⚡ Gardio - December Lab
-        ### A personal experimental Space for learning AI/ML deployment
+    
+    return transforms.get(mode, text)
+
+# ============================================
+# BUILD THE UI
+# ============================================
+
+with gr.Blocks(title="Gardio - December Lab") as demo:
+    
+    # Inject CSS via HTML
+    gr.HTML("""
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
         
-        Created by **Xeyronox** for December 2025 transformation journey.
+        body, .gradio-container, .main, .contain, .app {
+            background: #0a0a0a !important;
+            font-family: 'Space Grotesk', -apple-system, sans-serif !important;
+        }
+        
+        .gr-panel, .gr-box, .gr-form, .block {
+            background: #141414 !important;
+            border: 1px solid #1f1f1f !important;
+            border-radius: 14px !important;
+        }
+        
+        .gr-textbox textarea, .gr-textbox input, .gr-number input, input, textarea {
+            background: #0f0f0f !important;
+            border: 1px solid #1f1f1f !important;
+            border-radius: 10px !important;
+            color: #e0e0e0 !important;
+            font-family: 'Space Grotesk', sans-serif !important;
+        }
+        
+        .gr-textbox textarea:focus, input:focus {
+            border-color: #8b5cf6 !important;
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.15) !important;
+        }
+        
+        label, .gr-label, span {
+            color: #888 !important;
+            font-family: 'Space Grotesk', sans-serif !important;
+        }
+        
+        .gr-button-primary, button.primary {
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%) !important;
+            border: none !important;
+            border-radius: 10px !important;
+            font-family: 'Space Grotesk', sans-serif !important;
+            font-weight: 600 !important;
+        }
+        
+        .gr-button-primary:hover {
+            transform: translateY(-1px) !important;
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3) !important;
+        }
+        
+        .tabs .tab-nav {
+            background: #111 !important;
+            border-radius: 12px !important;
+            padding: 5px !important;
+            border: 1px solid #1a1a1a !important;
+        }
+        
+        .tabs .tab-nav button {
+            background: transparent !important;
+            color: #666 !important;
+            border: none !important;
+            border-radius: 8px !important;
+            font-family: 'Space Grotesk', sans-serif !important;
+            font-weight: 500 !important;
+        }
+        
+        .tabs .tab-nav button.selected {
+            background: #1a1a1a !important;
+            color: #fff !important;
+        }
+        
+        .gr-markdown, .prose, p, h1, h2, h3 {
+            color: #e0e0e0 !important;
+            font-family: 'Space Grotesk', sans-serif !important;
+        }
+        
+        .gr-markdown code {
+            background: #1a1a1a !important;
+            color: #a78bfa !important;
+            font-family: 'JetBrains Mono', monospace !important;
+            padding: 2px 6px !important;
+            border-radius: 4px !important;
+        }
+        
+        .gr-markdown table { border-collapse: collapse !important; }
+        .gr-markdown th, .gr-markdown td {
+            border: 1px solid #222 !important;
+            padding: 8px 12px !important;
+            color: #ccc !important;
+        }
+        .gr-markdown th { background: #141414 !important; }
+        
+        @media (max-width: 768px) {
+            .gr-row { flex-direction: column !important; }
+            .gr-column { width: 100% !important; }
+            .tab-nav { flex-wrap: wrap !important; }
+            .tab-nav button { padding: 8px 10px !important; font-size: 12px !important; }
+        }
+    </style>
+    """)
+    
+    # Header
+    gr.HTML(
+        """
+        <div style="text-align: center; padding: 25px 15px; margin-bottom: 15px;">
+            <h1 style="
+                font-size: clamp(2rem, 5vw, 3rem); 
+                margin: 0; 
+                background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 50%, #ec4899 100%); 
+                -webkit-background-clip: text; 
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                font-family: 'Space Grotesk', sans-serif;
+                font-weight: 700;
+            ">⚡ GARDIO</h1>
+            <p style="color: #555; font-size: clamp(0.85rem, 2vw, 1rem); margin-top: 10px; font-family: 'Space Grotesk', sans-serif;">
+                December 2025 Transformation Lab
+            </p>
+            <p style="color: #333; font-size: 0.8rem; font-family: 'Space Grotesk', sans-serif;">
+                Built by <span style="color: #8b5cf6;">Xeyronox</span>
+            </p>
+        </div>
         """
     )
     
-    with gr.Tabs():
-        # Welcome Tab
+    with gr.Tabs() as tabs:
+        
+        # 👋 Welcome Tab
         with gr.Tab("👋 Welcome"):
-            gr.Markdown("### Get a personalized welcome message!")
             with gr.Row():
-                with gr.Column():
-                    name_input = gr.Textbox(
-                        label="Enter your name",
-                        placeholder="Type your name here...",
-                        lines=1
-                    )
-                    welcome_btn = gr.Button("Get Welcome Message", variant="primary")
-                with gr.Column():
-                    welcome_output = gr.Textbox(
-                        label="Welcome Message",
-                        lines=6,
-                        interactive=False
-                    )
-            
-            welcome_btn.click(
-                fn=welcome,
-                inputs=name_input,
-                outputs=welcome_output
-            )
-            
-            gr.Examples(
-                examples=[["Xeyronox"], ["Developer"], ["AI Enthusiast"]],
-                inputs=name_input
-            )
+                with gr.Column(scale=1):
+                    gr.Markdown("### 🎯 Get a personalized greeting")
+                    name_input = gr.Textbox(label="Your Name", placeholder="Enter your name...", lines=1)
+                    welcome_btn = gr.Button("✨ Get Welcome Message", variant="primary")
+                with gr.Column(scale=1):
+                    welcome_output = gr.Markdown(value="*Your message will appear here...*")
+            welcome_btn.click(welcome, name_input, welcome_output)
+            gr.Examples([["Xeyronox"], ["Developer"], ["AI Enthusiast"]], name_input)
         
-        # Calculator Tab
+        # 🔢 Calculator Tab
         with gr.Tab("🔢 Calculator"):
-            gr.Markdown("### Simple calculator for basic operations")
             with gr.Row():
-                with gr.Column():
+                with gr.Column(scale=1):
+                    gr.Markdown("### 🧮 Quick Calculator")
                     num1 = gr.Number(label="First Number", value=0)
-                    operation = gr.Radio(
-                        choices=["Add ➕", "Subtract ➖", "Multiply ✖️", "Divide ➗"],
-                        label="Operation",
-                        value="Add ➕"
-                    )
+                    operation = gr.Radio(["➕ Add", "➖ Subtract", "✖️ Multiply", "➗ Divide"], label="Operation", value="➕ Add")
                     num2 = gr.Number(label="Second Number", value=0)
-                    calc_btn = gr.Button("Calculate", variant="primary")
-                with gr.Column():
-                    calc_output = gr.Textbox(
-                        label="Result",
-                        lines=3,
-                        interactive=False
-                    )
-            
-            calc_btn.click(
-                fn=calculate,
-                inputs=[num1, operation, num2],
-                outputs=calc_output
-            )
-            
-            gr.Examples(
-                examples=[
-                    [10, "Add ➕", 5],
-                    [20, "Multiply ✖️", 3],
-                    [100, "Divide ➗", 4]
-                ],
-                inputs=[num1, operation, num2]
-            )
+                    calc_btn = gr.Button("🔢 Calculate", variant="primary")
+                with gr.Column(scale=1):
+                    calc_output = gr.Markdown(value="*Result will appear here...*")
+            calc_btn.click(calculate, [num1, operation, num2], calc_output)
         
-        # Text Analyzer Tab
-        with gr.Tab("📝 Text Analyzer"):
-            gr.Markdown("### Analyze your text for word count, character count, and more")
+        # 📝 Text Analyzer Tab
+        with gr.Tab("📝 Analyzer"):
             with gr.Row():
-                with gr.Column():
-                    text_input = gr.Textbox(
-                        label="Enter text to analyze",
-                        placeholder="Type or paste your text here...",
-                        lines=8
-                    )
-                    analyze_btn = gr.Button("Analyze Text", variant="primary")
-                with gr.Column():
-                    text_output = gr.Textbox(
-                        label="Analysis Results",
-                        lines=8,
-                        interactive=False
-                    )
-            
-            analyze_btn.click(
-                fn=analyze_text,
-                inputs=text_input,
-                outputs=text_output
-            )
-            
-            gr.Examples(
-                examples=[
-                    ["Hello World! This is a test sentence."],
-                    ["AI and Machine Learning are transforming the world."]
-                ],
-                inputs=text_input
-            )
+                with gr.Column(scale=1):
+                    gr.Markdown("### 📊 Text Analysis")
+                    text_input = gr.Textbox(label="Input Text", placeholder="Paste your text here...", lines=6)
+                    analyze_btn = gr.Button("📊 Analyze", variant="primary")
+                with gr.Column(scale=1):
+                    analyze_output = gr.Markdown(value="*Analysis will appear here...*")
+            analyze_btn.click(analyze_text, text_input, analyze_output)
         
-        # Word Frequency Counter Tab
-        with gr.Tab("📊 Word Frequency"):
-            gr.Markdown("### Analyze word frequency in your text")
+        # 📈 Word Frequency Tab
+        with gr.Tab("📈 Frequency"):
             with gr.Row():
-                with gr.Column():
-                    freq_input = gr.Textbox(
-                        label="Enter text to analyze",
-                        placeholder="Paste your text here to see word frequency...",
-                        lines=8
-                    )
-                    freq_btn = gr.Button("Analyze Word Frequency", variant="primary")
-                with gr.Column():
-                    freq_output = gr.Textbox(
-                        label="Word Frequency Analysis",
-                        lines=8,
-                        interactive=False
-                    )
-            
-            freq_btn.click(
-                fn=word_frequency_analyzer,
-                inputs=freq_input,
-                outputs=freq_output
-            )
-            
-            gr.Examples(
-                examples=[["The quick brown fox jumps over the lazy dog. The quick brown fox is fast."]],
-                inputs=freq_input
-            )
+                with gr.Column(scale=1):
+                    gr.Markdown("### 📈 Word Frequency Counter")
+                    freq_input = gr.Textbox(label="Input Text", placeholder="Enter text...", lines=6)
+                    freq_btn = gr.Button("📊 Count Words", variant="primary")
+                with gr.Column(scale=1):
+                    freq_output = gr.Markdown(value="*Frequency will appear here...*")
+            freq_btn.click(word_frequency, freq_input, freq_output)
         
-        # Text Transform Tab (Day 2 Addition)
-        with gr.Tab("🔄 Text Transform"):
-            gr.Markdown("### Transform your text in fun and useful ways!")
+        # 🔄 Transform Tab
+        with gr.Tab("🔄 Transform"):
             with gr.Row():
-                with gr.Column():
-                    transform_input = gr.Textbox(
-                        label="Enter text to transform",
-                        placeholder="Type your text here...",
-                        lines=5
+                with gr.Column(scale=1):
+                    gr.Markdown("### 🔄 Text Transformer")
+                    trans_input = gr.Textbox(label="Input Text", placeholder="Enter text...", lines=4)
+                    trans_mode = gr.Radio(
+                        ["🔄 Reverse", "🔼 UPPERCASE", "🔽 lowercase", "📏 No Spaces", "🎯 Title Case", "🔀 Shuffle Words"],
+                        label="Transform Mode", value="🔄 Reverse"
                     )
-                    transform_type = gr.Radio(
-                        choices=[
-                            "🔄 Reverse Text",
-                            "🔼 UPPERCASE",
-                            "🔽 lowercase",
-                            "📏 Remove Spaces",
-                            "🎯 Count Vowels & Consonants"
-                        ],
-                        label="Choose transformation",
-                        value="🔄 Reverse Text"
-                    )
-                    transform_btn = gr.Button("Transform", variant="primary")
-                with gr.Column():
-                    transform_output = gr.Textbox(
-                        label="Transformed Text",
-                        lines=8,
-                        interactive=False
-                    )
-            
-            def transform_text(text, transform_type):
-                if not text or text.strip() == "":
-                    return "⚠️ Please enter some text to transform."
-                
-                if transform_type == "🔄 Reverse Text":
-                    return text[::-1]
-                elif transform_type == "🔼 UPPERCASE":
-                    return text.upper()
-                elif transform_type == "🔽 lowercase":
-                    return text.lower()
-                elif transform_type == "📏 Remove Spaces":
-                    return text.replace(" ", "")
-                elif transform_type == "🎯 Count Vowels & Consonants":
-                    vowels = "aeiouAEIOU"
-                    vowel_count = sum(1 for char in text if char in vowels)
-                    consonant_count = sum(1 for char in text if char.isalpha() and char not in vowels)
-                    total_alpha = sum(1 for char in text if char.isalpha())
-                    
-                    result = f"📊 **Character Analysis:**\n\n"
-                    result += f"• **Vowels:** {vowel_count}\n"
-                    result += f"• **Consonants:** {consonant_count}\n"
-                    result += f"• **Total Letters:** {total_alpha}\n"
-                    if total_alpha > 0:
-                        vowel_percent = (vowel_count / total_alpha) * 100
-                        result += f"• **Vowel Percentage:** {vowel_percent:.1f}%\n"
-                    result += f"\n**Original Text:**\n{text}"
-                    return result
-                
-                return text
-            
-            transform_btn.click(
-                fn=transform_text,
-                inputs=[transform_input, transform_type],
-                outputs=transform_output
-            )
-            
-            gr.Examples(
-                examples=[
-                    ["Hello World!", "🔄 Reverse Text"],
-                    ["make this loud", "🔼 UPPERCASE"],
-                    ["MAKE THIS QUIET", "🔽 lowercase"]
-                ],
-                inputs=[transform_input, transform_type]
-            )
+                    trans_btn = gr.Button("🔄 Transform", variant="primary")
+                with gr.Column(scale=1):
+                    trans_output = gr.Textbox(label="Transformed Text", lines=4, interactive=False)
+            trans_btn.click(transform_text, [trans_input, trans_mode], trans_output)
     
-    gr.Markdown(
+    # Footer
+    gr.HTML(
         """
-        ---
-        **Powered by Gradio 6.0.2** | Built with ❤️ by Xeyronox
+        <div style="text-align: center; padding: 20px; margin-top: 20px; border-top: 1px solid #1a1a1a;">
+            <p style="color: #444; font-size: 0.8rem; font-family: 'Space Grotesk', sans-serif; margin: 0;">
+                Powered by <span style="color: #6366f1;">Gradio 6.0.2</span> • Built with ❤️ by <span style="color: #8b5cf6;">Xeyronox</span>
+            </p>
+        </div>
         """
     )
+
+# ============================================
+# LAUNCH
+# ============================================
 
 if __name__ == "__main__":
     demo.launch()
