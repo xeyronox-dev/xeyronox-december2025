@@ -1,33 +1,40 @@
-# 🚀 Gardio - Text Analysis Suite
+---
+title: Gardio
+emoji: ⚡
+colorFrom: indigo
+colorTo: purple
+sdk: gradio
+sdk_version: "5.9.1"
+app_file: app.py
+pinned: true
+license: mit
+short_description: Advanced Text Analysis and Processing Toolkit
+---
+
+# ⚡ Gardio - Text Analysis Suite
 
 **Xeyronox December 2025 Transformation Journey**
 
-A comprehensive text analysis and processing toolkit built with Gradio, featuring modern UI/UX and powerful text manipulation capabilities.
+A modern text analysis and processing toolkit built with Gradio.
 
 ## ✨ Features
 
-This Gradio Space includes:
-
-- **👋 Welcome Tab** - Personalized greeting messages with randomized responses
-- **🔢 Calculator** - Basic arithmetic operations (add, subtract, multiply, divide)
-- **📝 Text Analyzer** - Comprehensive text analysis including word count, character count, and statistics
-- **🔄 Text Transform** - Fun text transformations (reverse, case conversion, space removal, vowel counting)
+- **👋 Welcome** - Personalized greeting messages
+- **🔢 Calculator** - Basic arithmetic operations
+- **📝 Analyzer** - Text statistics and analysis
+- **📈 Frequency** - Word frequency counter with visual bars
+- **🔄 Transform** - Text transformations (reverse, case, shuffle)
 
 ## 🛠️ Tech Stack
 
-- **Gradio 6.0.2** - Web UI framework
-- **Python 3.x** - Programming language
+- **Gradio 5.9.1** - Web UI framework
+- **Python 3.10** - Programming language
 - **HuggingFace Spaces** - Deployment platform
 
-## 📦 Deployment
+## 🔗 Links
 
-This Space is automatically synced with:
 - **GitHub:** [xeyronox-dev/xeyronox-december2025](https://github.com/xeyronox-dev/xeyronox-december2025)
 - **HuggingFace:** [xeyronox/Gardio](https://huggingface.co/spaces/xeyronox/Gardio)
-
-## 📚 Documentation
-
-Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
 
 ---
 
