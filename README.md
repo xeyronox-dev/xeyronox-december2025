@@ -1,23 +1,23 @@
 ---
 title: Gardio
 emoji: ⚡
-colorFrom: green
-colorTo: gray
+colorFrom: indigo
+colorTo: blue
 sdk: gradio
-sdk_version: "6.0.2"
+sdk_version: "4.19.0"
 app_file: app.py
-pinned: false
-license: unlicense
-short_description: Xeyronox December 2025 - AI/ML Learning Space
+pinned: true
+license: mit
+short_description: Advanced Text Analysis and Processing Toolkit
 ---
 
-# Gardio ⚡
+# 🚀 Gardio - Text Analysis Suite
 
 **Xeyronox December 2025 Transformation Journey**
 
-Daily work, notes, and learning progress for December 2025 transformation.
+A comprehensive text analysis and processing toolkit built with Gradio, featuring modern UI/UX and powerful text manipulation capabilities.
 
-## 🚀 Features
+## ✨ Features
 
 This Gradio Space includes:
 

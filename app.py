@@ -1,5 +1,7 @@
 import gradio as gr
 import random
+import re
+from collections import Counter
 from datetime import datetime
 
 # Welcome message function
@@ -67,8 +69,58 @@ def analyze_text(text):
     
     return analysis
 
-# Create tabbed interface
-with gr.Blocks(title="Gardio - December Lab") as demo:
+def word_frequency_analyzer(text):
+    if not text or text.strip() == "":
+        return "📝 Please enter some text to analyze."
+    
+    # Clean text and split into words
+    words = re.sub(r'[^\w\s]', ' ', text.lower()).split()
+    
+    if not words:
+        return "No valid words found in the text."
+    
+    # Calculate statistics
+    word_counts = Counter(words)
+    total_words = len(words)
+    unique_words = len(word_counts)
+    top_words = word_counts.most_common(5)
+    
+    # Format results
+    result = f"📊 **Word Frequency Analysis**\n\n"
+    result += f"• **Total words:** {total_words:,}\n"
+    result += f"• **Unique words:** {unique_words:,}\n\n"
+    
+    result += "**Top 5 Most Frequent Words:**\n"
+    for i, (word, count) in enumerate(top_words, 1):
+        percentage = (count / total_words) * 100
+        result += f"{i}. '{word}': {count:,} ({percentage:.1f}%)\n"
+    
+    return result
+
+# Create tabbed interface with dark theme
+with gr.Blocks(
+    title="Gardio - December Lab",
+    theme=gr.themes.Soft(
+        primary_hue="blue",
+        secondary_hue="indigo",
+        neutral_hue="slate",
+        radius_size=gr.themes.sizes.radius_md,
+        font=["Inter", "sans-serif"],
+    )
+) as demo:
+    # Custom CSS for additional styling
+    css = """
+    .gradio-container {
+        background: linear-gradient(135deg, #1e1e2f 0%, #1a1a2e 100%) !important;
+    }
+    .gradio-header {
+        color: white !important;
+    }
+    .tab-nav button {
+        font-weight: 600 !important;
+    }
+    """
+    demo.css = css
     gr.Markdown(
         """
         # ⚡ Gardio - December Lab
@@ -173,6 +225,35 @@ with gr.Blocks(title="Gardio - December Lab") as demo:
                     ["AI and Machine Learning are transforming the world."]
                 ],
                 inputs=text_input
+            )
+        
+        # Word Frequency Counter Tab
+        with gr.Tab("📊 Word Frequency"):
+            gr.Markdown("### Analyze word frequency in your text")
+            with gr.Row():
+                with gr.Column():
+                    freq_input = gr.Textbox(
+                        label="Enter text to analyze",
+                        placeholder="Paste your text here to see word frequency...",
+                        lines=8
+                    )
+                    freq_btn = gr.Button("Analyze Word Frequency", variant="primary")
+                with gr.Column():
+                    freq_output = gr.Textbox(
+                        label="Word Frequency Analysis",
+                        lines=8,
+                        interactive=False
+                    )
+            
+            freq_btn.click(
+                fn=word_frequency_analyzer,
+                inputs=freq_input,
+                outputs=freq_output
+            )
+            
+            gr.Examples(
+                examples=[["The quick brown fox jumps over the lazy dog. The quick brown fox is fast."]],
+                inputs=freq_input
             )
         
         # Text Transform Tab (Day 2 Addition)
