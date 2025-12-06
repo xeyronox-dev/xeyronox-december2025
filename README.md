@@ -19,11 +19,11 @@ A modern text analysis and processing toolkit built with Gradio.
 
 ## ✨ Features
 
-- **👋 Welcome** - Personalized greeting messages
-- **🔢 Calculator** - Basic arithmetic operations
-- **📝 Analyzer** - Text statistics and analysis
-- **📈 Frequency** - Word frequency counter with visual bars
-- **🔄 Transform** - Text transformations (reverse, case, shuffle)
+- **💎 Premium Glass UI** - Deep dark theme with glassmorphism
+- **💬 Intelligent Chat** - Responsive system assistant
+- **📝 Analytics** - Real-time statistics with visual insights
+- **📈 Frequency** - Live word frequency counter with animated bars
+- **🛠️ Toolbox** - Quick math and text transformations
 
 ## 🛠️ Tech Stack
 

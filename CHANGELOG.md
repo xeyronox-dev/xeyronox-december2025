@@ -6,6 +6,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Core Logic Upgrades - 2025-12-06
+- **💬 Enhanced Chat Intelligence**
+  - Added support for "Jokes", "Quotes", "Creator Info", and "Capabilities"
+  - Interactive keyword detection system
+- **📊 Analytics Engine 2.0**
+  - Added **Reading Time** estimation
+  - Added **Stop Word Filtering** for frequency analysis (cleaner insights)
+- **🛠️ Toolbox Expansion**
+  - Added Power (`^`) and Modulo (`%`) math operators
+  - Added "Sentence Case" and "No Punctuation" text transformers
+- **💎 Visual Polish**
+  - "Premium Glass" UI with Deep Dark theme (#050505)
+  - Refined gradients, spacing, and animations
+- **⚡ Real-Time Engine**
+  - Enabled instant analysis and frequency updates on typing
+
+### Fixed
+- **Chatbot Crash:** Resolved Gradio 5.x message format error (Dict vs Tuple)
+- **Searchbar Issue:** Disabled invalid text input in Toolbox dropdowns
+
 ### Added - 2025-12-04
 - **Word Frequency Counter**
   - Added new tab for analyzing word frequencies
