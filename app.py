@@ -1,7 +1,7 @@
 """
-⚡ GARDIO - Premium Glass Edition
-Author: Xeyronox | Version: 5.9.1
-Design: Premium Glassmorphism + Robust Chat + Micro-Polish
+⚡ GARDIO - Text Intelligence Suite
+Author: Xeyronox | Version: 2.0.0
+Design: Clean, Robust, Mobile-First
 """
 
 import gradio as gr
@@ -11,323 +11,555 @@ from collections import Counter
 from datetime import datetime
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# 🔧 CORE LOGIC
+# 📦 CONSTANTS
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-def chat_fn(message, history):
-    """
-    Robust Chat Function
-    - Handles basic conversational intents
-    - details: Simple keyword matching for responsiveness
-    """
-    if not message or not message.strip():
-        return history, ""
-    
-    msg = message.lower().strip()
-    
-    # Basic Intelligence Layer
-    if any(x in msg for x in ["hello", "hi", "hey"]):
-        content = "Hello! 👋 I'm Gardio. Ready to analyze your text."
-    elif "name" in msg:
-        content = "I am Gardio (v5.9.1). I'm a specialized text intelligence interface."
-    elif any(x in msg for x in ["work", "job", "can do", "help", "capability"]):
-        content = "I can help you with:\n• 📊 Text Analysis\n• 📈 Word Frequency\n• 🔄 Text Transformation\n\nJust use the tabs above!"
-    elif any(x in msg for x in ["made", "create", "author", "dev", "who are you"]):
-        content = "I was designed and built by Xeyronox in the December Lab! 🧪"
-    elif "joke" in msg:
-        jokes = [
-            "Why do programmers prefer dark mode? Because light attracts bugs! 🐛",
-            "I told my CSS joke to a backend developer... but they didn't see the style. 🎨",
-            "A SQL query walks into a bar, walks up to two tables and asks... 'Can I join you?' 🧩"
-        ]
-        content = random.choice(jokes)
-    elif "quote" in msg:
-        quotes = [
-            "“Code is like humor. When you have to explain it, it’s bad.” – Cory House",
-            "“First, solve the problem. Then, write the code.” – John Johnson",
-            "“Simplicity is the soul of efficiency.” – Austin Freeman"
-        ]
-        content = f"{random.choice(quotes)} 📜"
-    elif "time" in msg:
-        content = f"Current system time is {datetime.now().strftime('%H:%M')} 🕐"
-    else:
-        content = f"Input received: '{message}' 🟢\n(Advanced definition modules are in standby)"
+VERSION = "2.0.0"
+DEBUG = True
 
-    # Gradio 5.x 'messages' format
-    history.append({"role": "user", "content": message})
-    history.append({"role": "assistant", "content": content})
-    
-    return history, ""
+STOP_WORDS = {
+    "the", "and", "a", "to", "of", "in", "it", "is", "i", "that", 
+    "on", "for", "was", "with", "as", "be", "at", "by", "this"
+}
 
-def analyze_text(text):
-    if not text or not text.strip():
-        return '<div class="empty-state">📝 Enter text to see analytics...</div>', ""
-    
-    words = text.split()
-    chars = len(text)
-    lines = len(text.splitlines())
-    avg = sum(len(w) for w in words) / len(words) if words else 0
-    read_time = round(len(words) / 200, 1) # Avg 200 wpm
-    if read_time < 0.1: read_time = "< 0.1"
-    
-    html = f"""
-    <div class="stats-grid">
-        <div class="glass-card stat-card">
-            <span class="label">Total Characters</span>
-            <span class="value">{chars:,}</span>
-        </div>
-        <div class="glass-card stat-card">
-            <span class="label">Word Count</span>
-            <span class="value">{len(words):,}</span>
-        </div>
-        <div class="glass-card stat-card">
-            <span class="label">Line Count</span>
-            <span class="value">{lines:,}</span>
-        </div>
-        <div class="glass-card stat-card">
-            <span class="label">Avg Word Len</span>
-            <span class="value">{avg:.1f}</span>
-        </div>
-        <div class="glass-card stat-card" style="border-color: rgba(6,182,212,0.3);">
-            <span class="label">Reading Time</span>
-            <span class="value">{read_time} m</span>
-        </div>
-    </div>
-    """
-    return html
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 🔧 HELPER FUNCTIONS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-def count_frequency(text):
-    if not text or not text.strip():
-        return '<div class="empty-state">📊 Enter text to analyze frequency...</div>'
-    
-    clean_text = re.sub(r'[^\w\s]', '', text.lower())
-    words = clean_text.split()
-    
-    # Core Logic Upgrade: Stop Words
-    stop_words = {"the", "and", "a", "to", "of", "in", "it", "is", "i", "that", "on", "for"}
-    filtered = [w for w in words if w not in stop_words]
-    
-    if not filtered:
-        return '<div class="empty-state">⚠️ No significant words found</div>'
-    
-    counter = Counter(filtered)
-    total = len(filtered)
-    top_5 = counter.most_common(5)
-    
-    html = '<div class="glass-panel freq-panel">'
-    html += '<div style="font-size:0.8rem; color:#9ca3af; margin-bottom:12px;">(Common stop words filtered)</div>'
-    for i, (word, count) in enumerate(top_5, 1):
-        pct = (count / total) * 100
-        html += f"""
-        <div class="freq-row">
-            <div class="freq-info">
-                <span class="rank">#{i}</span>
-                <span class="word">{word}</span>
-                <span class="count">{count}</span>
+def log_debug(func_name: str, message: str):
+    """Debug logging for HF Spaces logs."""
+    if DEBUG:
+        print(f"[DEBUG] {func_name}: {message}")
+
+def validate_text(text: str) -> tuple[bool, str]:
+    """Validate text input. Returns (is_valid, cleaned_text)."""
+    if text is None:
+        return False, ""
+    cleaned = text.strip()
+    if not cleaned:
+        return False, ""
+    if len(cleaned) > 50000:
+        log_debug("validate_text", "Input too long, truncating")
+        cleaned = cleaned[:50000]
+    return True, cleaned
+
+def html_empty(message: str = "Enter text to begin...") -> str:
+    """Return styled empty state HTML."""
+    return f'<div class="empty-state">📝 {message}</div>'
+
+def html_error(message: str = "An error occurred") -> str:
+    """Return styled error state HTML."""
+    return f'<div class="error-state">⚠️ {message}</div>'
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 📊 CORE LOGIC - TEXT ANALYTICS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+def analyze_text(text: str) -> str:
+    """Analyze text and return statistics HTML."""
+    try:
+        is_valid, cleaned = validate_text(text)
+        if not is_valid:
+            return html_empty("Enter text to see analytics...")
+        
+        log_debug("analyze_text", f"Processing {len(cleaned)} chars")
+        
+        words = cleaned.split()
+        chars = len(cleaned)
+        lines = len(cleaned.splitlines())
+        word_count = len(words)
+        avg_len = sum(len(w) for w in words) / word_count if word_count else 0
+        read_time = round(word_count / 200, 1)  # 200 wpm average
+        
+        return f"""
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="label">Characters</span>
+                <span class="value">{chars:,}</span>
             </div>
-            <div class="progress-bg">
-                <div class="progress-fill" style="width: {pct}%"></div>
+            <div class="stat-card">
+                <span class="label">Words</span>
+                <span class="value">{word_count:,}</span>
+            </div>
+            <div class="stat-card">
+                <span class="label">Lines</span>
+                <span class="value">{lines:,}</span>
+            </div>
+            <div class="stat-card">
+                <span class="label">Avg Length</span>
+                <span class="value">{avg_len:.1f}</span>
+            </div>
+            <div class="stat-card highlight">
+                <span class="label">Read Time</span>
+                <span class="value">{read_time}m</span>
             </div>
         </div>
         """
-    html += '</div>'
-    return html
-
-# ... (Transform & Math functions) ...
-
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# 🎨 PREMIUM GLASS CSS (POLISHED)
-# ...
+    except Exception as e:
+        log_debug("analyze_text", f"ERROR: {e}")
+        return html_error("Analysis failed. Please try again.")
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 📈 CORE LOGIC - WORD FREQUENCY
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-
-def transform_text(text, mode):
-    """
-    Text Transformation Logic
-    - Clean dictionary-based dispatch
-    """
-    if not text: 
-        return ""
-    
-    # Transformation Operations
-    operations = {
-        "Reverse 🔄": lambda t: t[::-1],
-        "UPPERCASE 🔼": lambda t: t.upper(),
-        "lowercase 🔽": lambda t: t.lower(),
-        "Title Case 🎯": lambda t: t.title(),
-        "Sentence Case 📝": lambda t: t.capitalize(),
-        "No Spaces 📏": lambda t: t.replace(" ", ""),
-        "No Punctuation 🚫": lambda t: re.sub(r'[^\w\s]', '', t),
-        "Shuffle 🔀": lambda t: " ".join(random.sample(t.split(), len(t.split())))
-    }
-    
-    # Execute selected operation
-    transformer = operations.get(mode, lambda t: t)
-    return transformer(text)
-
-def math_calc(a, op, b):
+def count_frequency(text: str) -> str:
+    """Count word frequency with stop word filtering."""
     try:
-        a, b = float(a), float(b)
-        res = 0
-        if op == "+": res = a + b
-        elif op == "-": res = a - b
-        elif op == "×": res = a * b
-        elif op == "÷": res = "Error" if b == 0 else a / b
-        elif op == "^": res = a ** b
-        elif op == "%": res = a % b
+        is_valid, cleaned = validate_text(text)
+        if not is_valid:
+            return html_empty("Enter text to analyze frequency...")
         
-        return str(res) if res == "Error" else f"{res:,.4g}"
-    except: return "Invalid Input"
+        log_debug("count_frequency", f"Processing {len(cleaned)} chars")
+        
+        # Clean and tokenize
+        clean_text = re.sub(r'[^\w\s]', '', cleaned.lower())
+        words = clean_text.split()
+        
+        # Filter stop words
+        filtered = [w for w in words if w not in STOP_WORDS and len(w) > 1]
+        
+        if not filtered:
+            return html_empty("No significant words found")
+        
+        counter = Counter(filtered)
+        total = len(filtered)
+        top_5 = counter.most_common(5)
+        
+        html = '<div class="freq-panel">'
+        html += '<p class="freq-note">Stop words filtered</p>'
+        for i, (word, count) in enumerate(top_5, 1):
+            pct = (count / total) * 100
+            html += f"""
+            <div class="freq-row">
+                <span class="rank">#{i}</span>
+                <span class="word">{word}</span>
+                <span class="count">{count}</span>
+                <div class="bar-bg"><div class="bar-fill" style="width:{pct}%"></div></div>
+            </div>
+            """
+        html += '</div>'
+        return html
+        
+    except Exception as e:
+        log_debug("count_frequency", f"ERROR: {e}")
+        return html_error("Frequency analysis failed.")
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# 🎨 PREMIUM GLASS CSS (POLISHED)
+# 🔄 CORE LOGIC - TEXT TRANSFORMER
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+def transform_text(text: str, mode: str) -> str:
+    """Transform text based on selected mode."""
+    try:
+        is_valid, cleaned = validate_text(text)
+        if not is_valid:
+            return ""
+        
+        log_debug("transform_text", f"Mode: {mode}")
+        
+        operations = {
+            "Reverse": lambda t: t[::-1],
+            "UPPERCASE": lambda t: t.upper(),
+            "lowercase": lambda t: t.lower(),
+            "Title Case": lambda t: t.title(),
+            "Sentence Case": lambda t: t.capitalize(),
+            "No Spaces": lambda t: t.replace(" ", ""),
+            "No Punctuation": lambda t: re.sub(r'[^\w\s]', '', t),
+            "Shuffle Words": lambda t: " ".join(random.sample(t.split(), len(t.split())) if t.split() else [])
+        }
+        
+        transformer = operations.get(mode, lambda t: t)
+        return transformer(cleaned)
+        
+    except Exception as e:
+        log_debug("transform_text", f"ERROR: {e}")
+        return "Error: Transformation failed"
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 🔢 CORE LOGIC - QUICK MATH
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+def calculate(a: float, op: str, b: float) -> str:
+    """Perform basic math operations."""
+    try:
+        log_debug("calculate", f"{a} {op} {b}")
+        
+        if op == "+":
+            result = a + b
+        elif op == "-":
+            result = a - b
+        elif op == "×":
+            result = a * b
+        elif op == "÷":
+            if b == 0:
+                return "Error: Division by zero"
+            result = a / b
+        elif op == "^":
+            result = a ** b
+        elif op == "%":
+            if b == 0:
+                return "Error: Modulo by zero"
+            result = a % b
+        else:
+            return "Error: Unknown operator"
+        
+        # Format result
+        if result == int(result):
+            return str(int(result))
+        return f"{result:,.4g}"
+        
+    except Exception as e:
+        log_debug("calculate", f"ERROR: {e}")
+        return "Error: Calculation failed"
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 💬 CORE LOGIC - SIMPLE CHAT
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+def chat_respond(message: str, history: list) -> tuple[list, str]:
+    """Simple keyword-based chat response."""
+    try:
+        is_valid, cleaned = validate_text(message)
+        if not is_valid:
+            return history, ""
+        
+        log_debug("chat_respond", f"Input: {cleaned[:50]}...")
+        
+        msg = cleaned.lower()
+        
+        # Keyword matching
+        if any(x in msg for x in ["hello", "hi", "hey"]):
+            response = "Hello! 👋 I'm Gardio. How can I help you analyze text today?"
+        elif "name" in msg:
+            response = f"I'm Gardio v{VERSION} - a text intelligence assistant."
+        elif any(x in msg for x in ["help", "what can you do", "features"]):
+            response = "I can help with:\n• 📊 Text Analytics\n• 📈 Word Frequency\n• 🔄 Text Transformations\n• 🔢 Quick Math"
+        elif any(x in msg for x in ["who made", "created", "author"]):
+            response = "I was built by Xeyronox! 🚀"
+        elif "time" in msg:
+            response = f"Current time: {datetime.now().strftime('%H:%M:%S')} 🕐"
+        elif "joke" in msg:
+            jokes = [
+                "Why do programmers prefer dark mode? Light attracts bugs! 🐛",
+                "There are 10 types of people: those who understand binary and those who don't.",
+                "A SQL query walks into a bar and asks two tables: 'Can I join you?'"
+            ]
+            response = random.choice(jokes)
+        else:
+            response = f"Received: '{cleaned[:30]}...'\nTry asking for 'help' to see what I can do!"
+        
+        # Append to history (Gradio 5.x format)
+        history.append({"role": "user", "content": cleaned})
+        history.append({"role": "assistant", "content": response})
+        
+        return history, ""
+        
+    except Exception as e:
+        log_debug("chat_respond", f"ERROR: {e}")
+        history.append({"role": "user", "content": message})
+        history.append({"role": "assistant", "content": "Sorry, I encountered an error. Please try again."})
+        return history, ""
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 🎨 CSS - PREMIUM GLASS EDITION
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap');
 
 :root {
-    --bg-color: #050505;
-    --glass-bg: rgba(20, 20, 20, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.08);
+    --bg: #050508;
+    --surface: rgba(15, 15, 20, 0.8);
+    --glass: rgba(255, 255, 255, 0.03);
+    --border: rgba(255, 255, 255, 0.08);
+    --border-glow: rgba(139, 92, 246, 0.3);
     --accent: #8b5cf6;
-    --accent-glow: rgba(139, 92, 246, 0.4);
-    --text-primary: #f3f4f6;
-    --text-secondary: #9ca3af;
+    --accent-secondary: #06b6d4;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --gradient: linear-gradient(135deg, #8b5cf6, #06b6d4);
 }
 
+/* Base */
 body, .gradio-container {
-    background-color: var(--bg-color) !important;
+    background: var(--bg) !important;
     background-image: 
-        radial-gradient(circle at 10% 20%, rgba(76, 29, 149, 0.1), transparent 40%), 
-        radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.1), transparent 40%) !important;
-    font-family: 'Inter', sans-serif !important;
-    color: var(--text-primary) !important;
+        radial-gradient(ellipse at 20% 0%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(6, 182, 212, 0.1) 0%, transparent 50%) !important;
+    font-family: 'Inter', -apple-system, sans-serif !important;
+    color: var(--text) !important;
+    min-height: 100vh;
 }
 
-/* Glass Panels with improved padding/spacing */
-.glass-panel, .glass-card, .block, .gradio-accordion {
-    background: var(--glass-bg) !important;
-    backdrop-filter: blur(16px) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
-    border: 1px solid var(--glass-border) !important;
+/* Glass Panels */
+.block, .form, .gradio-accordion {
+    background: var(--surface) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid var(--border) !important;
     border-radius: 16px !important;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
-    padding: 24px !important; /* A: More breathing room */
-    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+    box-shadow: 
+        0 4px 30px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+    transition: all 0.3s ease !important;
 }
 
-.glass-card:hover {
-    box-shadow: 0 8px 32px 0 rgba(139, 92, 246, 0.15) !important;
+.block:hover {
+    border-color: var(--border-glow) !important;
+    box-shadow: 
+        0 8px 40px rgba(139, 92, 246, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
 }
 
-/* Typography Polish */
-h1, h2, h3, h4, h5, h6 { font-weight: 600 !important; letter-spacing: -0.5px !important; }
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 16px;
+    padding: 12px;
+}
 
-/* Inputs - C: Improved Placeholders & Focus */
-textarea, input, .gr-input {
-    background: rgba(10, 10, 10, 0.6) !important;
-    border: 1px solid var(--glass-border) !important;
+.stat-card {
+    background: var(--glass) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 16px;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent);
+    box-shadow: 0 12px 40px rgba(139, 92, 246, 0.2);
+}
+
+.stat-card.highlight {
+    border-color: var(--accent-secondary);
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), transparent) !important;
+}
+
+.stat-card .label {
+    display: block;
+    font-size: 0.65rem;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+.stat-card .value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Frequency Bars */
+.freq-panel {
+    padding: 20px;
+    background: var(--glass);
+    border-radius: 14px;
+}
+
+.freq-note {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-bottom: 16px;
+    padding: 8px 12px;
+    background: rgba(139, 92, 246, 0.1);
+    border-radius: 8px;
+    display: inline-block;
+}
+
+.freq-row {
+    display: grid;
+    grid-template-columns: 32px 1fr 50px;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 16px;
+    padding: 12px;
+    background: var(--glass);
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+.freq-row:hover {
+    background: rgba(139, 92, 246, 0.08);
+}
+
+.rank { 
+    color: var(--accent); 
+    font-weight: 700; 
+    font-size: 0.9rem;
+}
+.word { 
+    color: var(--text); 
+    font-weight: 500;
+}
+.count { 
+    color: var(--accent-secondary); 
+    text-align: right;
+    font-weight: 600;
+    font-family: 'Space Grotesk', monospace;
+}
+
+.bar-bg {
+    grid-column: 1 / -1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    background: var(--gradient);
+    border-radius: 3px;
+    box-shadow: 0 0 12px rgba(139, 92, 246, 0.4);
+    animation: fillBar 0.8s ease-out;
+}
+
+@keyframes fillBar {
+    from { width: 0 !important; }
+}
+
+/* Empty & Error States */
+.empty-state, .error-state {
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--muted);
+    border: 1px dashed var(--border);
+    border-radius: 16px;
+    background: var(--glass);
+    font-size: 0.95rem;
+}
+
+.error-state {
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #fca5a5;
+    background: rgba(239, 68, 68, 0.05);
+}
+
+/* Inputs */
+textarea, input, select {
+    background: rgba(0, 0, 0, 0.4) !important;
+    border: 1px solid var(--border) !important;
     border-radius: 12px !important;
-    color: var(--text-primary) !important;
-    font-size: 0.95rem !important;
-    padding: 12px 16px !important;
+    color: var(--text) !important;
+    font-family: 'Inter', sans-serif !important;
     transition: all 0.25s ease !important;
 }
 
 textarea:focus, input:focus {
     border-color: var(--accent) !important;
-    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2) !important;
-    transform: translateY(-1px);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15) !important;
+    outline: none !important;
 }
 
 textarea::placeholder, input::placeholder {
-    color: rgba(156, 163, 175, 0.6) !important;
+    color: var(--muted) !important;
+    opacity: 0.6 !important;
 }
 
-/* Buttons - D: Light Animation */
+/* Buttons */
 button.primary {
-    background: linear-gradient(135deg, #7c3aed, #4f46e5) !important;
+    background: var(--gradient) !important;
     border: none !important;
-    color: white !important;
     border-radius: 12px !important;
     font-weight: 600 !important;
+    font-size: 0.9rem !important;
     padding: 12px 24px !important;
     transition: all 0.3s ease !important;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3) !important;
 }
 
 button.primary:hover {
     transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4) !important;
     filter: brightness(1.1) !important;
-    box-shadow: 0 10px 15px -3px rgba(124, 58, 237, 0.4) !important;
 }
 
-/* Stats Grid - A: Spacing */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Better responsiveness */
-    gap: 20px;
-    margin-top: 10px;
+button.secondary {
+    background: var(--glass) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text) !important;
 }
 
-.stat-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 24px !important;
-}
-
-.stat-card .label {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    margin-bottom: 12px;
-}
-
-.stat-card .value {
-    font-size: 2rem;
-    font-weight: 700;
-    background: linear-gradient(to right, #fff, #c4b5fd);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-/* Frequency Bars */
-.freq-panel { padding: 24px !important; }
-.freq-row { margin-bottom: 20px; }
-.freq-info { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.95rem; }
-.rank { color: var(--accent); font-weight: 700; width: 30px; }
-.word { color: var(--text-primary); font-weight: 500; }
-.count { color: var(--text-secondary); font-variant-numeric: tabular-nums; }
-.progress-bg { height: 6px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; overflow: hidden; }
-.progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #22d3ee); border-radius: 10px; }
-
-/* Tabs - B: Better Labels Styling */
+/* Tabs */
 .tab-nav {
-    background: rgba(0,0,0,0.2) !important;
-    border-radius: 16px !important;
+    background: rgba(0, 0, 0, 0.3) !important;
+    border-radius: 14px !important;
     padding: 6px !important;
-    margin-bottom: 32px !important;
-    border: 1px solid rgba(255,255,255,0.03) !important;
-    gap: 4px;
+    border: 1px solid var(--border) !important;
+    margin-bottom: 24px !important;
+}
+
+.tab-nav button {
+    border-radius: 10px !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
 }
 
 button.selected {
-    background: var(--glass-bg) !important;
-    color: #fff !important;
+    background: var(--surface) !important;
     border: 1px solid var(--accent) !important;
-    box-shadow: 0 0 20px var(--accent-glow) !important;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3) !important;
 }
 
-/* Chatbot Area */
-.chatbot { height: 500px !important; border-radius: 16px !important; overflow: hidden !important; }
-.header-row { margin-bottom: 20px !important; }
+/* Chatbot */
+.chatbot {
+    height: 450px !important;
+    background: transparent !important;
+    border-radius: 16px !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--glass);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a78bfa;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    .stat-card {
+        padding: 14px 10px;
+    }
+    .stat-card .value {
+        font-size: 1.4rem;
+    }
+}
+
+/* Dropdown */
+.gr-dropdown {
+    background: var(--surface) !important;
+}
 </style>
 """
 
@@ -335,118 +567,171 @@ button.selected {
 # 🚀 APP LAYOUT
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-with gr.Blocks(title="Gardio Premium") as demo:
+with gr.Blocks(title="Gardio - Text Intelligence") as demo:
     gr.HTML(CSS)
     
-    # ⚡ Header
-    with gr.Row(elem_classes="header-row"):
-        gr.HTML("""
-        <div style="text-align: center; padding: 40px 0 30px;">
-            <h1 style="font-size: 4rem; font-weight: 800; margin: 0; background: linear-gradient(135deg, #a78bfa, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -2px; filter: drop-shadow(0 0 20px rgba(139,92,246,0.2));">
-                GARDIO
-            </h1>
-            <p style="color: #9ca3af; font-size: 1.2rem; margin-top: 12px; font-weight: 300; letter-spacing: 1px;">Premium Text Intelligence Lab</p>
-        </div>
-        """)
-
-    # 🗂️ Main Tabs - Clean & Consistent
+    # Header
+    gr.HTML(f"""
+    <div style="text-align:center; padding:24px 0;">
+        <h1 style="font-size:2.5rem; font-weight:700; margin:0; color:#fff;">
+            ⚡ GARDIO
+        </h1>
+        <p style="color:#9ca3af; margin-top:8px;">Text Intelligence Suite v{VERSION}</p>
+    </div>
+    """)
+    
     with gr.Tabs():
         
-        # 💬 Chat
-        with gr.Tab("💬 Assistant"):
+        # 💬 Chat Tab
+        with gr.Tab("💬 Chat"):
+            chatbot = gr.Chatbot(show_label=False, elem_classes="chatbot")
             with gr.Row():
-                with gr.Column(scale=1):
-                    chatbot = gr.Chatbot(
-                        label="System Chat", 
-                        show_label=False,
-                        avatar_images=(None, "https://www.gradio.app/favicon.ico"),
-                        elem_classes="chatbot"
-                    )
-                    with gr.Row():
-                        msg_input = gr.Textbox(
-                            placeholder="Type a command or say hello...", 
-                            show_label=False, 
-                            scale=9, 
-                            container=False,
-                            autofocus=True
-                        )
-                        send_btn = gr.Button("➤", variant="primary", scale=1, min_width=80)
+                msg = gr.Textbox(placeholder="Say hello...", show_label=False, scale=4)
+                send = gr.Button("Send", variant="primary", scale=1)
             
-            msg_input.submit(chat_fn, [msg_input, chatbot], [chatbot, msg_input])
-            send_btn.click(chat_fn, [msg_input, chatbot], [chatbot, msg_input])
-
-        # � Stats
+            msg.submit(chat_respond, [msg, chatbot], [chatbot, msg])
+            send.click(chat_respond, [msg, chatbot], [chatbot, msg])
+        
+        # 📊 Analytics Tab
         with gr.Tab("📊 Analytics"):
             with gr.Row():
-                with gr.Column(scale=1):
-                    txt_input = gr.Textbox(
+                with gr.Column():
+                    txt_in = gr.Textbox(
                         label="Input Text", 
-                        lines=12, 
-                        placeholder="Paste your content here for deep analysis (Articles, Essays, Code)...",
-                        show_label=False
+                        lines=8, 
+                        placeholder="Paste text here..."
                     )
-                    analyze_btn = gr.Button("Analyze Content ⚡", variant="primary")
-                
-                with gr.Column(scale=1):
-                    stats_output = gr.HTML(label="Statistics")
+                    gr.Button("Analyze", variant="primary").click(
+                        analyze_text, inputs=[txt_in], outputs=[gr.HTML()]
+                    )
+                with gr.Column():
+                    stats_out = gr.HTML()
             
-            analyze_btn.click(analyze_text, inputs=[txt_input], outputs=[stats_output, txt_input])
-
-        # 📈 Frequency
+            txt_in.change(analyze_text, inputs=[txt_in], outputs=[stats_out])
+        
+        # 📈 Frequency Tab
         with gr.Tab("📈 Frequency"):
             with gr.Row():
-                with gr.Column(scale=1):
-                    freq_input = gr.Textbox(
+                with gr.Column():
+                    freq_in = gr.Textbox(
                         label="Input Text", 
-                        lines=10, 
-                        placeholder="Enter text to extract top keywords...",
-                        show_label=False
+                        lines=6, 
+                        placeholder="Enter text to find keywords..."
                     )
-                    freq_btn = gr.Button("Scan Keywords 🔍", variant="primary")
-                
-                with gr.Column(scale=1):
-                    freq_output = gr.HTML(label="Keywords")
+                    gr.Button("Find Keywords", variant="primary").click(
+                        count_frequency, inputs=[freq_in], outputs=[gr.HTML()]
+                    )
+                with gr.Column():
+                    freq_out = gr.HTML()
             
-            freq_btn.click(count_frequency, inputs=[freq_input], outputs=[freq_output])
-
-        # 🛠️ Tools
+            freq_in.change(count_frequency, inputs=[freq_in], outputs=[freq_out])
+        
+        # 🛠️ Toolbox Tab - Multiple Sections
         with gr.Tab("🛠️ Toolbox"):
-            with gr.Row():
-                # Transformer
-                with gr.Column():
-                    gr.Markdown("### 🔄 Text Transformer")
-                    t_in = gr.Textbox(label="Original", lines=4, placeholder="Type text to transform...", show_label=False)
-                    t_mode = gr.Dropdown([
-                        "Reverse 🔄", "UPPERCASE 🔼", "lowercase 🔽", 
-                        "Title Case 🎯", "Sentence Case 📝",
-                        "No Spaces 📏", "No Punctuation 🚫", "Shuffle 🔀"
-                    ], label="Operation", value="Reverse 🔄", show_label=False, container=False, filterable=False)
-                    t_out = gr.Textbox(label="Result", lines=4, interactive=False, show_label=False)
-                    
-                    # Binding changes
-                    t_mode.change(transform_text, [t_in, t_mode], t_out)
-                    t_in.change(transform_text, [t_in, t_mode], t_out)
-                    gr.Button("Apply Transform ✨", variant="primary").click(transform_text, [t_in, t_mode], t_out)
+            
+            with gr.Tabs():
                 
-                # Calculator
-                with gr.Column():
-                    gr.Markdown("### 🔢 Quick Math")
+                # 🔄 Transform Sub-Tab
+                with gr.Tab("🔄 Transform"):
+                    gr.HTML('<p style="color:#94a3b8; margin-bottom:16px;">Transform your text instantly</p>')
+                    t_in = gr.Textbox(
+                        label="Input Text", 
+                        lines=4, 
+                        placeholder="Enter text to transform..."
+                    )
+                    t_mode = gr.Dropdown(
+                        choices=[
+                            "Reverse", "UPPERCASE", "lowercase", 
+                            "Title Case", "Sentence Case", 
+                            "No Spaces", "No Punctuation", "Shuffle Words"
+                        ],
+                        value="Reverse",
+                        label="Transformation",
+                        interactive=True,
+                        allow_custom_value=False
+                    )
+                    t_out = gr.Textbox(label="Result", lines=4, interactive=True)
+                    gr.Button("Transform ✨", variant="primary").click(
+                        transform_text, [t_in, t_mode], t_out
+                    )
+                    t_in.change(transform_text, [t_in, t_mode], t_out)
+                    t_mode.change(transform_text, [t_in, t_mode], t_out)
+                
+                # 🔢 Calculator Sub-Tab
+                with gr.Tab("🔢 Calculator"):
+                    gr.HTML('<p style="color:#94a3b8; margin-bottom:16px;">Quick math operations</p>')
                     with gr.Row():
-                        num_a = gr.Number(label="A", value=0, show_label=False)
-                        op_sel = gr.Dropdown(
-                            ["+", "-", "×", "÷", "^ (Power)", "% (Mod)"], 
-                            value="+", label="Op", container=False, show_label=False, filterable=False
+                        num_a = gr.Number(value=0, label="Number A")
+                        op = gr.Dropdown(
+                            choices=["+", "-", "×", "÷", "^ (Power)", "% (Mod)"], 
+                            value="+", 
+                            label="Operator",
+                            interactive=True,
+                            allow_custom_value=False
                         )
-                        num_b = gr.Number(label="B", value=0, show_label=False)
-                    calc_res = gr.Textbox(label="Result", interactive=False, show_label=False, placeholder="0")
-                    gr.Button("Calculate 🧮", variant="primary").click(math_calc, [num_a, op_sel, num_b], calc_res)
+                        num_b = gr.Number(value=0, label="Number B")
+                    calc_out = gr.Textbox(label="Result", interactive=True, placeholder="0")
+                    gr.Button("Calculate 🧮", variant="primary").click(
+                        calculate, [num_a, op, num_b], calc_out
+                    )
+                
+                # 📏 Quick Stats Sub-Tab
+                with gr.Tab("📏 Quick Stats"):
+                    gr.HTML('<p style="color:#94a3b8; margin-bottom:16px;">Instant text measurements</p>')
+                    qs_in = gr.Textbox(
+                        label="Input Text", 
+                        lines=4, 
+                        placeholder="Paste text here..."
+                    )
+                    with gr.Row():
+                        qs_chars = gr.Textbox(label="Characters", interactive=True)
+                        qs_words = gr.Textbox(label="Words", interactive=True)
+                        qs_lines = gr.Textbox(label="Lines", interactive=True)
+                        qs_vowels = gr.Textbox(label="Vowels", interactive=True)
+                    
+                    def quick_stats(text):
+                        if not text:
+                            return "", "", "", ""
+                        chars = str(len(text))
+                        words = str(len(text.split()))
+                        lines = str(len(text.splitlines()))
+                        vowels = str(sum(1 for c in text.lower() if c in 'aeiou'))
+                        return chars, words, lines, vowels
+                    
+                    qs_in.change(quick_stats, [qs_in], [qs_chars, qs_words, qs_lines, qs_vowels])
+                    gr.Button("Count 📊", variant="primary").click(
+                        quick_stats, [qs_in], [qs_chars, qs_words, qs_lines, qs_vowels]
+                    )
+                
+                # 🔍 Find & Replace Sub-Tab
+                with gr.Tab("🔍 Find & Replace"):
+                    gr.HTML('<p style="color:#94a3b8; margin-bottom:16px;">Search and replace text</p>')
+                    fr_text = gr.Textbox(label="Text", lines=4, placeholder="Your text here...")
+                    with gr.Row():
+                        fr_find = gr.Textbox(label="Find", placeholder="Search for...", interactive=True)
+                        fr_replace = gr.Textbox(label="Replace with", placeholder="Replace with...", interactive=True)
+                    fr_out = gr.Textbox(label="Result", lines=4, interactive=True)
+                    
+                    def find_replace(text, find, replace):
+                        if not text or not find:
+                            return text or ""
+                        return text.replace(find, replace)
+                    
+                    gr.Button("Replace All 🔄", variant="primary").click(
+                        find_replace, [fr_text, fr_find, fr_replace], fr_out
+                    )
     
     # Footer
     gr.HTML("""
-    <div style="text-align: center; padding: 40px; color: #4b5563; font-size: 0.8rem; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 60px;">
-        <p style="opacity: 0.6;">Gardio v5.9.1 • Micro-Polished • Xeyronox</p>
+    <div style="text-align:center; padding:24px; color:#6b7280; font-size:0.75rem;">
+        Built with ❤️ by Xeyronox
     </div>
     """)
 
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 🏃 LAUNCH
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 if __name__ == "__main__":
+    log_debug("main", f"Starting Gardio v{VERSION}")
     demo.launch()

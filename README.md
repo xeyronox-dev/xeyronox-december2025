@@ -8,34 +8,36 @@ sdk_version: "5.9.1"
 app_file: app.py
 pinned: true
 license: mit
-short_description: Advanced Text Analysis and Processing Toolkit
+short_description: Text Intelligence Suite with Analytics & Tools
 ---
 
-# ⚡ Gardio - Text Analysis Suite
+# ⚡ Gardio - Text Intelligence Suite
 
-**Xeyronox December 2025 Transformation Journey**
+**Version 2.0.0** | Built by Xeyronox
 
-A modern text analysis and processing toolkit built with Gradio.
+A clean, robust text analysis toolkit with real-time analytics.
 
 ## ✨ Features
 
-- **💎 Premium Glass UI** - Deep dark theme with glassmorphism
-- **💬 Intelligent Chat** - Responsive system assistant
-- **📝 Analytics** - Real-time statistics with visual insights
-- **📈 Frequency** - Live word frequency counter with animated bars
-- **🛠️ Toolbox** - Quick math and text transformations
+- **� Chat** - Simple keyword-based assistant
+- **� Analytics** - Character, word, line count + read time
+- **📈 Frequency** - Top keywords with stop word filtering
+- **🛠️ Toolbox** - 8 text transforms + 6 math operators
 
-## 🛠️ Tech Stack
+## 🛡️ Reliability
 
-- **Gradio 5.9.1** - Web UI framework
-- **Python 3.10** - Programming language
-- **HuggingFace Spaces** - Deployment platform
+- Input validation on all functions
+- Error handling with fallback UI
+- Debug logging for troubleshooting
+- Mobile-responsive design
+
+## � Tech Stack
+
+- **Gradio 5.9.1** - Stable, HF-compatible
+- **Python 3.10+**
+- **HuggingFace Spaces**
 
 ## 🔗 Links
 
-- **GitHub:** [xeyronox-dev/xeyronox-december2025](https://github.com/xeyronox-dev/xeyronox-december2025)
-- **HuggingFace:** [xeyronox/Gardio](https://huggingface.co/spaces/xeyronox/Gardio)
-
----
-
-**Built with ❤️ by Xeyronox**
+- [GitHub](https://github.com/xeyronox-dev/xeyronox-december2025)
+- [HuggingFace Space](https://huggingface.co/spaces/xeyronox/Gardio)
