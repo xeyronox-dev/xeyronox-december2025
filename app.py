@@ -1,6 +1,6 @@
 """
 ⚡ GARDIO - Text Intelligence Suite
-Author: Xeyronox | Version: 2.0.0
+Author: Xeyronox | Version: 2.1.0
 Design: Clean, Robust, Mobile-First
 """
 
@@ -14,7 +14,7 @@ from datetime import datetime
 # 📦 CONSTANTS
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-VERSION = "2.0.0"
+VERSION = "2.1.0"
 DEBUG = True
 
 STOP_WORDS = {
@@ -214,11 +214,64 @@ def calculate(a: float, op: str, b: float) -> str:
         return "Error: Calculation failed"
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# 💬 CORE LOGIC - SIMPLE CHAT
+# � CORE LOGIC - QUICK STATS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+def quick_stats(text: str) -> tuple:
+    """Quick text statistics."""
+    try:
+        if not text:
+            return "", "", "", ""
+        chars = str(len(text))
+        words = str(len(text.split()))
+        lines = str(len(text.splitlines()))
+        vowels = str(sum(1 for c in text.lower() if c in 'aeiou'))
+        return chars, words, lines, vowels
+    except Exception as e:
+        log_debug("quick_stats", f"ERROR: {e}")
+        return "Error", "Error", "Error", "Error"
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 🔍 CORE LOGIC - FIND & REPLACE
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+def find_replace(text: str, find: str, replace: str) -> str:
+    """Find and replace text."""
+    try:
+        if not text or not find:
+            return text or ""
+        return text.replace(find, replace)
+    except Exception as e:
+        log_debug("find_replace", f"ERROR: {e}")
+        return text or ""
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 🧹 CORE LOGIC - REMOVE DUPLICATES
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+def remove_duplicates(text: str) -> str:
+    """Remove duplicate lines from text."""
+    try:
+        if not text:
+            return ""
+        lines = text.splitlines()
+        seen = set()
+        unique = []
+        for line in lines:
+            if line not in seen:
+                seen.add(line)
+                unique.append(line)
+        return "\n".join(unique)
+    except Exception as e:
+        log_debug("remove_duplicates", f"ERROR: {e}")
+        return text or ""
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# �💬 CORE LOGIC - SIMPLE CHAT
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 def chat_respond(message: str, history: list) -> tuple[list, str]:
-    """Simple keyword-based chat response."""
+    """Enhanced keyword-based chat assistant."""
     try:
         is_valid, cleaned = validate_text(message)
         if not is_valid:
@@ -227,27 +280,107 @@ def chat_respond(message: str, history: list) -> tuple[list, str]:
         log_debug("chat_respond", f"Input: {cleaned[:50]}...")
         
         msg = cleaned.lower()
+        response = ""
         
-        # Keyword matching
-        if any(x in msg for x in ["hello", "hi", "hey"]):
-            response = "Hello! 👋 I'm Gardio. How can I help you analyze text today?"
-        elif "name" in msg:
-            response = f"I'm Gardio v{VERSION} - a text intelligence assistant."
-        elif any(x in msg for x in ["help", "what can you do", "features"]):
-            response = "I can help with:\n• 📊 Text Analytics\n• 📈 Word Frequency\n• 🔄 Text Transformations\n• 🔢 Quick Math"
-        elif any(x in msg for x in ["who made", "created", "author"]):
-            response = "I was built by Xeyronox! 🚀"
+        # Greetings
+        if any(x in msg for x in ["hello", "hi", "hey", "good morning", "good evening"]):
+            greetings = [
+                "Hello! 👋 I'm Gardio. Ready to analyze your text!",
+                "Hey there! 🌟 What would you like to do today?",
+                "Hi! I'm your text assistant. Type 'help' for commands!"
+            ]
+            response = random.choice(greetings)
+        
+        # Identity
+        elif any(x in msg for x in ["your name", "who are you", "what are you"]):
+            response = f"I'm **Gardio v{VERSION}** - a text intelligence assistant built with Gradio! 🤖"
+        
+        # Help / Commands
+        elif any(x in msg for x in ["help", "commands", "what can you do", "features"]):
+            response = """📋 **Available Commands:**
+• `hello` - Greet me
+• `help` - Show this menu
+• `time` - Current time
+• `date` - Today's date
+• `joke` - Random joke
+• `quote` - Inspirational quote
+• `author` - Who made me
+• `version` - App version
+• `tips` - Text analysis tips
+• `bye` - Say goodbye"""
+        
+        # Time
         elif "time" in msg:
-            response = f"Current time: {datetime.now().strftime('%H:%M:%S')} 🕐"
+            response = f"🕐 Current time: **{datetime.now().strftime('%H:%M:%S')}**"
+        
+        # Date
+        elif "date" in msg:
+            response = f"� Today is: **{datetime.now().strftime('%A, %B %d, %Y')}**"
+        
+        # Author / Creator
+        elif any(x in msg for x in ["who made", "created", "author", "developer", "built by"]):
+            response = "🚀 I was built by **Xeyronox** in the December Lab!"
+        
+        # Version
+        elif "version" in msg:
+            response = f"📦 **Gardio v{VERSION}**\n• Framework: Gradio 5.9.1\n• Python 3.10+"
+        
+        # Jokes
         elif "joke" in msg:
             jokes = [
-                "Why do programmers prefer dark mode? Light attracts bugs! 🐛",
-                "There are 10 types of people: those who understand binary and those who don't.",
-                "A SQL query walks into a bar and asks two tables: 'Can I join you?'"
+                "Why do programmers prefer dark mode? Because light attracts bugs! 🐛",
+                "There are 10 types of people: those who understand binary and those who don't. 💻",
+                "A SQL query walks into a bar and asks two tables: 'Can I join you?' 🍺",
+                "Why do Java developers wear glasses? Because they can't C#! 👓",
+                "What's a programmer's favorite hangout? Foo Bar! 🍸",
+                "How do you comfort a JavaScript bug? You console it! 🖥️"
             ]
             response = random.choice(jokes)
+        
+        # Quotes
+        elif "quote" in msg:
+            quotes = [
+                "'Code is like humor. When you have to explain it, it's bad.' - Cory House 📝",
+                "'First, solve the problem. Then, write the code.' - John Johnson 💡",
+                "'Simplicity is the soul of efficiency.' - Austin Freeman ✨",
+                "'Programs must be written for people to read.' - Harold Abelson 📖",
+                "'Good programmers write code that humans can understand.' - Martin Fowler 🧠"
+            ]
+            response = random.choice(quotes)
+        
+        # Tips
+        elif "tip" in msg:
+            tips = [
+                "💡 **Tip:** Use the Analytics tab for detailed text statistics!",
+                "💡 **Tip:** The Frequency tab filters out common stop words for better insights!",
+                "💡 **Tip:** Try the 'Remove Duplicates' tool for cleaning up lists!",
+                "💡 **Tip:** Use 'Find & Replace' for bulk text editing!"
+            ]
+            response = random.choice(tips)
+        
+        # Thanks
+        elif any(x in msg for x in ["thank", "thanks", "thx"]):
+            response = "You're welcome! 😊 Let me know if you need anything else!"
+        
+        # Goodbye
+        elif any(x in msg for x in ["bye", "goodbye", "exit", "quit"]):
+            response = "Goodbye! 👋 Come back anytime you need text help!"
+        
+        # Clear
+        elif "clear" in msg:
+            history = []
+            response = "🧹 Chat cleared! Fresh start!"
+            history.append({"role": "assistant", "content": response})
+            return history, ""
+        
+        # Fallback
         else:
-            response = f"Received: '{cleaned[:30]}...'\nTry asking for 'help' to see what I can do!"
+            fallbacks = [
+                f"I received: '{cleaned[:25]}...'\n💡 Try typing 'help' to see what I can do!",
+                f"Hmm, I don't understand '{cleaned[:20]}...'\nType 'commands' for a list of things I can help with!",
+                f"🤔 Not sure about that. Type 'help' for available commands!"
+            ]
+            response = random.choice(fallbacks)
         
         # Append to history (Gradio 5.x format)
         history.append({"role": "user", "content": cleaned})
@@ -258,7 +391,7 @@ def chat_respond(message: str, history: list) -> tuple[list, str]:
     except Exception as e:
         log_debug("chat_respond", f"ERROR: {e}")
         history.append({"role": "user", "content": message})
-        history.append({"role": "assistant", "content": "Sorry, I encountered an error. Please try again."})
+        history.append({"role": "assistant", "content": "⚠️ Sorry, I encountered an error. Please try again."})
         return history, ""
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -637,16 +770,14 @@ with gr.Blocks(title="Gardio - Text Intelligence") as demo:
                         lines=4, 
                         placeholder="Enter text to transform..."
                     )
-                    t_mode = gr.Dropdown(
+                    t_mode = gr.Radio(
                         choices=[
                             "Reverse", "UPPERCASE", "lowercase", 
                             "Title Case", "Sentence Case", 
                             "No Spaces", "No Punctuation", "Shuffle Words"
                         ],
                         value="Reverse",
-                        label="Transformation",
-                        interactive=True,
-                        allow_custom_value=False
+                        label="Transformation"
                     )
                     t_out = gr.Textbox(label="Result", lines=4, interactive=True)
                     gr.Button("Transform ✨", variant="primary").click(
@@ -660,12 +791,10 @@ with gr.Blocks(title="Gardio - Text Intelligence") as demo:
                     gr.HTML('<p style="color:#94a3b8; margin-bottom:16px;">Quick math operations</p>')
                     with gr.Row():
                         num_a = gr.Number(value=0, label="Number A")
-                        op = gr.Dropdown(
-                            choices=["+", "-", "×", "÷", "^ (Power)", "% (Mod)"], 
+                        op = gr.Radio(
+                            choices=["+", "-", "×", "÷", "^", "%"], 
                             value="+", 
-                            label="Operator",
-                            interactive=True,
-                            allow_custom_value=False
+                            label="Operator"
                         )
                         num_b = gr.Number(value=0, label="Number B")
                     calc_out = gr.Textbox(label="Result", interactive=True, placeholder="0")
@@ -687,19 +816,9 @@ with gr.Blocks(title="Gardio - Text Intelligence") as demo:
                         qs_lines = gr.Textbox(label="Lines", interactive=True)
                         qs_vowels = gr.Textbox(label="Vowels", interactive=True)
                     
-                    def quick_stats(text):
-                        if not text:
-                            return "", "", "", ""
-                        chars = str(len(text))
-                        words = str(len(text.split()))
-                        lines = str(len(text.splitlines()))
-                        vowels = str(sum(1 for c in text.lower() if c in 'aeiou'))
-                        return chars, words, lines, vowels
-                    
                     qs_in.change(quick_stats, [qs_in], [qs_chars, qs_words, qs_lines, qs_vowels])
-                    gr.Button("Count 📊", variant="primary").click(
-                        quick_stats, [qs_in], [qs_chars, qs_words, qs_lines, qs_vowels]
-                    )
+                    qs_btn = gr.Button("Count 📊", variant="primary")
+                    qs_btn.click(quick_stats, [qs_in], [qs_chars, qs_words, qs_lines, qs_vowels])
                 
                 # 🔍 Find & Replace Sub-Tab
                 with gr.Tab("🔍 Find & Replace"):
@@ -710,11 +829,6 @@ with gr.Blocks(title="Gardio - Text Intelligence") as demo:
                         fr_replace = gr.Textbox(label="Replace with", placeholder="Replace with...", interactive=True)
                     fr_out = gr.Textbox(label="Result", lines=4, interactive=True)
                     
-                    def find_replace(text, find, replace):
-                        if not text or not find:
-                            return text or ""
-                        return text.replace(find, replace)
-                    
                     fr_btn = gr.Button("Replace All 🔄", variant="primary")
                     fr_btn.click(find_replace, [fr_text, fr_find, fr_replace], fr_out)
                 
@@ -723,18 +837,6 @@ with gr.Blocks(title="Gardio - Text Intelligence") as demo:
                     gr.HTML('<p style="color:#94a3b8; margin-bottom:16px;">Remove duplicate lines from text</p>')
                     rd_in = gr.Textbox(label="Input Text", lines=6, placeholder="Paste text with duplicate lines...")
                     rd_out = gr.Textbox(label="Result (Unique Lines)", lines=6, interactive=True)
-                    
-                    def remove_duplicates(text):
-                        if not text:
-                            return ""
-                        lines = text.splitlines()
-                        seen = set()
-                        unique = []
-                        for line in lines:
-                            if line not in seen:
-                                seen.add(line)
-                                unique.append(line)
-                        return "\n".join(unique)
                     
                     rd_btn = gr.Button("Remove Duplicates 🧹", variant="primary")
                     rd_btn.click(remove_duplicates, [rd_in], rd_out)

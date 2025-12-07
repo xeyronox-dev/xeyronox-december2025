@@ -8,21 +8,29 @@ sdk_version: "5.9.1"
 app_file: app.py
 pinned: true
 license: mit
-short_description: Text Intelligence Suite with Analytics & Tools
+short_description: Text Intelligence Suite with Analytics & Toolbox
 ---
 
 # ⚡ Gardio - Text Intelligence Suite
 
-**Version 2.0.0** | Built by Xeyronox
+**Version 2.1.0** | Built by Xeyronox
 
 A clean, robust text analysis toolkit with real-time analytics.
 
 ## ✨ Features
 
-- **� Chat** - Simple keyword-based assistant
-- **� Analytics** - Character, word, line count + read time
+- **🎨 Premium Glass UI** - Glassmorphism, gradient text, neon glow
+- **💬 Smart Chat** - 11+ commands (help, joke, quote, time, date...)
+- **📊 Analytics** - Character, word, line count + read time
 - **📈 Frequency** - Top keywords with stop word filtering
-- **🛠️ Toolbox** - 8 text transforms + 6 math operators
+- **🛠️ Toolbox** - 5 sub-tabs with powerful tools
+
+### Toolbox Tools
+- 🔄 **Transform** - 8 text transformations (radio selection)
+- 🔢 **Calculator** - 6 math operators
+- 📏 **Quick Stats** - Instant counts
+- 🔍 **Find & Replace** - Bulk editing
+- 🧹 **Remove Duplicates** - Clean up lines
 
 ## 🛡️ Reliability
 
@@ -30,12 +38,6 @@ A clean, robust text analysis toolkit with real-time analytics.
 - Error handling with fallback UI
 - Debug logging for troubleshooting
 - Mobile-responsive design
-
-## � Tech Stack
-
-- **Gradio 5.9.1** - Stable, HF-compatible
-- **Python 3.10+**
-- **HuggingFace Spaces**
 
 ## 🔗 Links
 
