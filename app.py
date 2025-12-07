@@ -601,13 +601,12 @@ with gr.Blocks(title="Gardio - Text Intelligence") as demo:
                         lines=8, 
                         placeholder="Paste text here..."
                     )
-                    gr.Button("Analyze", variant="primary").click(
-                        analyze_text, inputs=[txt_in], outputs=[gr.HTML()]
-                    )
+                    analyze_btn = gr.Button("Analyze", variant="primary")
                 with gr.Column():
                     stats_out = gr.HTML()
             
             txt_in.change(analyze_text, inputs=[txt_in], outputs=[stats_out])
+            analyze_btn.click(analyze_text, inputs=[txt_in], outputs=[stats_out])
         
         # 📈 Frequency Tab
         with gr.Tab("📈 Frequency"):
@@ -618,13 +617,12 @@ with gr.Blocks(title="Gardio - Text Intelligence") as demo:
                         lines=6, 
                         placeholder="Enter text to find keywords..."
                     )
-                    gr.Button("Find Keywords", variant="primary").click(
-                        count_frequency, inputs=[freq_in], outputs=[gr.HTML()]
-                    )
+                    freq_btn = gr.Button("Find Keywords", variant="primary")
                 with gr.Column():
                     freq_out = gr.HTML()
             
             freq_in.change(count_frequency, inputs=[freq_in], outputs=[freq_out])
+            freq_btn.click(count_frequency, inputs=[freq_in], outputs=[freq_out])
         
         # 🛠️ Toolbox Tab - Multiple Sections
         with gr.Tab("🛠️ Toolbox"):
@@ -717,9 +715,30 @@ with gr.Blocks(title="Gardio - Text Intelligence") as demo:
                             return text or ""
                         return text.replace(find, replace)
                     
-                    gr.Button("Replace All 🔄", variant="primary").click(
-                        find_replace, [fr_text, fr_find, fr_replace], fr_out
-                    )
+                    fr_btn = gr.Button("Replace All 🔄", variant="primary")
+                    fr_btn.click(find_replace, [fr_text, fr_find, fr_replace], fr_out)
+                
+                # 🧹 Remove Duplicates Sub-Tab
+                with gr.Tab("🧹 Remove Duplicates"):
+                    gr.HTML('<p style="color:#94a3b8; margin-bottom:16px;">Remove duplicate lines from text</p>')
+                    rd_in = gr.Textbox(label="Input Text", lines=6, placeholder="Paste text with duplicate lines...")
+                    rd_out = gr.Textbox(label="Result (Unique Lines)", lines=6, interactive=True)
+                    
+                    def remove_duplicates(text):
+                        if not text:
+                            return ""
+                        lines = text.splitlines()
+                        seen = set()
+                        unique = []
+                        for line in lines:
+                            if line not in seen:
+                                seen.add(line)
+                                unique.append(line)
+                        return "\n".join(unique)
+                    
+                    rd_btn = gr.Button("Remove Duplicates 🧹", variant="primary")
+                    rd_btn.click(remove_duplicates, [rd_in], rd_out)
+                    rd_in.change(remove_duplicates, [rd_in], rd_out)
     
     # Footer
     gr.HTML("""
