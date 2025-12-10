@@ -1,49 +1,46 @@
 # Changelog
 
-All notable changes documented here.
+## [2.2.0] - 2025-12-10
+
+### Added
+- **Word Counter** - Total, unique, longest word, avg length
+- **Number Extractor** - Find all numbers in text
+- **URL Extractor** - Find all URLs in text
+- **Text Trimmer** - Remove extra whitespace
+- **To List** - Convert text lines to Python list
+- **To Tuple** - Convert text lines to Python tuple
+- **To Dict** - Convert key:value lines to Python dict
+- **String Ops** - Length, Split, Join, Is Alpha/Digit/Alnum
+- **Multi-language Chat** - Hola, Bonjour, Namaste greetings
+- **10+ Jokes** - Expanded joke collection
+- **10+ Quotes** - Expanded quote collection
+- **Python Tools** - List, Tuple, Dict, String operations (NEW)
+
+### Fixed
+- **API Error** - All functions now top-level with `fn=` parameter
+- **Event Handlers** - Proper component references
+
+### Changed
+- Version bumped to 2.2.0
+- Toolbox now has 12 tools
+
+---
 
 ## [2.1.0] - 2025-12-07
 
 ### Added
-- **Enhanced Chatbot** - 11+ commands (hello, help, time, date, joke, quote, author, version, tips, thanks, bye, clear)
-- **Remove Duplicates Tool** - New Toolbox sub-tab to remove duplicate lines
-- **Radio Selection** - Transform and Calculator now use radio buttons (no typing)
+- Enhanced Chatbot (11+ commands)
+- Radio selection for Transform/Calculator
+- Remove Duplicates tool
 
 ### Fixed
-- **No API Found Error** - Moved inline functions to top-level (HuggingFace compatibility)
-- **Button Handlers** - All buttons now use pre-defined output components
-- **Dropdown Issue** - Replaced with Radio buttons for pure click-to-select
-
-### Changed
-- Version bumped to 2.1.0
-- Improved chatbot responses with markdown formatting
-- Added more programming jokes and quotes
+- No API Found error
+- Button handlers
 
 ---
 
 ## [2.0.0] - 2025-12-07
-
-### 🔄 Full Rewrite
-Complete code reset following audit checklist for stability and reliability.
-
-### Added
-- **Debug Logging** - All functions log to console for HF debugging
-- **Input Validation** - `validate_text()` helper prevents crashes
-- **Error Handling** - Try-except wrappers on all core functions
-- **Fallback UI** - Empty/error states show friendly messages
-- **Read Time** - Analytics now shows estimated reading time
-- **Premium Glass CSS** - Glassmorphism, gradients, neon glow
-
-### Changed
-- **Architecture** - Clean separation: Constants → Helpers → Logic → UI
-- **CSS** - Mobile-first design
-- **Chat** - Keyword-based responses (no ML dependencies)
-
----
-
-## [1.x] - Previous Versions
-
-See git history for Day 1-6 changes.
+Full rewrite with clean architecture, error handling, Premium Glass CSS.
 
 ---
 
