@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.3.0] - Turbo Edition
+
+### Changed
+- **Gradio Upgrade** - Updated to Gradio 6.1.0
+- **Turbo Mode** - Native JS/CSS injection using `gr.Blocks` parameters
+- **Optimized** - Disabled debug logging & pre-compiled regex
+
+### Added
+- **JSON Formatter** - Pretty print & validate JSON
+- **Diff Checker** - Compare two texts
+- **Encoder/Decoder** - Base64 & URL conversion
+
 ## [2.2.0] - 2025-12-10
 
 ### Added
